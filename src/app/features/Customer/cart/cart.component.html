@@ -1,0 +1,85 @@
+<div class="min-h-screen bg-blue-50 p-6">
+  <div *ngIf="isLoading" class="flex justify-center items-center py-20 text-blue-600">
+    <i class="fa fa-spinner fa-spin text-3xl"></i>
+    <span class="ml-3 font-medium">Đang tải giỏ hàng...</span>
+  </div>
+
+  <div *ngIf="!isLoading && cartData.items.length === 0" class="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-10 text-center">
+    <div class="text-gray-400 mb-4 text-5xl">🛒</div>
+    <h2 class="text-xl font-bold text-gray-700 mb-2">Giỏ hàng của bạn đang trống</h2>
+    <p class="text-gray-500 mb-6">Hãy tìm thêm các sản phẩm thuốc và y tế cần thiết nhé!</p>
+    <button routerLink="/" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">
+      Tiếp tục mua sắm
+    </button>
+  </div>
+
+  <div *ngIf="!isLoading && cartData.items.length > 0" class="max-w-6xl mx-auto grid grid-cols-12 gap-6">
+    
+    <div class="col-span-12 lg:col-span-8 bg-white rounded-lg shadow-sm p-4">
+      <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+        <label class="flex items-center gap-2 cursor-pointer font-medium text-gray-700">
+          <input type="checkbox" class="w-4 h-4 text-blue-600"> Chọn tất cả
+        </label>
+      </div>
+
+      <div *ngFor="let item of cartData.items" class="flex items-center gap-4 py-4 border-b border-gray-100">
+        <input type="checkbox" class="w-4 h-4 text-blue-600">
+        
+        <img [src]="item.hinhAnh || 'assets/images/no-image.png'" class="w-16 h-16 object-cover rounded-md border border-gray-100">
+        
+        <div class="flex-1">
+          <p class="font-medium text-gray-800">{{ item.tenThuoc }}</p>
+        </div>
+        
+        <div class="font-bold text-blue-600 w-24 text-right">
+          {{ item.gia | number:'1.0-0' }}đ
+        </div>
+        
+        <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
+          <button (click)="decrease(item)" 
+                  [disabled]="item.soLuong <= 1"
+                  class="px-3 py-1 bg-gray-50 hover:bg-gray-200 disabled:opacity-50">-</button>
+                  
+          <input type="text" [value]="item.soLuong" readonly class="w-10 text-center text-sm outline-none bg-white">
+          
+          <button (click)="increase(item)" class="px-3 py-1 bg-gray-50 hover:bg-gray-200">+</button>
+        </div>
+        
+        <button (click)="removeItem(item.maThuoc)" class="ml-4 text-gray-400 hover:text-red-500 transition">
+          <i class="fa fa-trash text-lg"></i> 
+        </button>
+      </div>
+    </div>
+
+    <div class="col-span-12 lg:col-span-4">
+      <div class="bg-white rounded-lg shadow-sm p-5 sticky top-4">
+        <h2 class="text-lg font-bold mb-4 text-gray-800">Tổng tiền</h2>
+        
+        <div class="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-md cursor-pointer border border-dashed border-gray-300">
+          <span class="text-gray-600 text-sm">🎟 Khuyến mãi</span>
+          <span class="text-blue-600 font-medium text-sm">Chọn mã</span>
+        </div>
+
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between text-gray-600">
+            <span>Tạm tính</span>
+            <span>{{ getTotal() | number:'1.0-0' }}đ</span>
+          </div>
+          <div class="flex justify-between text-gray-600">
+            <span>Giảm giá</span>
+            <span>0đ</span>
+          </div>
+          <div class="pt-3 border-t border-gray-100 font-bold text-lg flex justify-between">
+            <span>Tổng tiền</span>
+            <span class="text-blue-600">{{ getTotal() | number:'1.0-0' }}đ</span>
+          </div>
+        </div>
+
+        <button class="w-full mt-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-md">
+          Tiến hành thanh toán
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
