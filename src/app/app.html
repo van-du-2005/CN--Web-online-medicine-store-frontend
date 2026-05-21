@@ -1,117 +1,175 @@
+<style>
+  /* Cây cầu tàng hình giữ trạng thái hover liên tục */
+  .menu-item .dropdown-panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding-top: 12px; /* Khoảng đệm tàng hình giúp chuột di chuyển không bị tắt */
+    z-index: 99;
+  }
+  /* Khi rê chuột vào danh mục cha thì hiện bảng danh mục con */
+  .menu-item:hover .dropdown-panel {
+    display: block;
+  }
+  /* Xoay mũi tên v khi rê chuột vào */
+  .menu-item:hover .fa-chevron-down {
+    transform: rotate(180deg);
+  }
+</style>
+
 <header class="bg-[#2a7bfa] py-3 shadow-md sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 flex items-center gap-6">
-        <a href="/" class="flex-shrink-0 flex items-center gap-2 bg-transparent text-white no-underline">
-            <div class="bg-white p-1 rounded-xl border-2 border-green-500 w-12 h-12 flex items-center justify-center">
-                <i class="fa-solid fa-leaf text-green-500 text-2xl"></i>
-            </div>
-            <div class="flex flex-col">
-                <span class="text-[10px] font-bold tracking-widest text-white uppercase leading-none">Nhà thuốc</span>
-                <span class="text-xl font-black italic text-white leading-none font-serif">Sống Khỏe</span>
-            </div>
-        </a>
+  <div class="max-w-6xl mx-auto px-4 flex items-center gap-6">
+    <a routerLink="/" class="flex-shrink-0 flex items-center gap-2 bg-transparent text-white no-underline">
+      <div class="bg-white p-1 rounded-xl border-2 border-green-500 w-12 h-12 flex items-center justify-center">
+        <i class="fa-solid fa-leaf text-green-500 text-2xl"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-[10px] font-bold tracking-widest text-white uppercase leading-none">Nhà thuốc</span>
+        <span class="text-xl font-black italic text-white leading-none font-serif">Sống Khỏe</span>
+      </div>
+    </a>
 
-        <div class="flex-1 max-w-2xl">
-          <form (ngSubmit)="timKiem()" class="flex bg-white rounded-full overflow-hidden shadow-inner h-10">
-            <input type="text"
-                   name="search"
-                   [(ngModel)]="tuKhoaTimKiem"
-                   placeholder="Tìm kiếm sản phẩm..."
-                   class="flex-1 border-none outline-none px-5 text-sm" />
-            <button type="submit" class="bg-white border-none px-4 text-gray-500 hover:text-blue-500 transition-colors">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-          </form>
-        </div>
+    <div class="flex-1 max-w-2xl relative">
+      <form (ngSubmit)="timKiem()" class="flex bg-white rounded-full overflow-hidden shadow-inner h-10 border-2 border-transparent focus-within:border-blue-400 transition-colors relative z-50">
+        <input type="text"
+               name="search"
+               [(ngModel)]="tuKhoaTimKiem"
+               (ngModelChange)="onTimKiemThayDoi()"
+               (focus)="onTimKiemThayDoi()"
+               (blur)="anGoiY()"
+               autocomplete="off"
+               placeholder="Tìm kiếm tên thuốc, triệu chứng, hoạt chất..."
+               class="flex-1 border-none outline-none px-5 text-sm w-full" />
+        <button type="submit" class="bg-white border-none px-5 text-gray-500 hover:text-blue-600 transition-colors bg-gray-50">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </form>
 
-        <div class="flex gap-3">
-            <a href="/cart" class="flex items-center gap-2 bg-[#155fc2] hover:bg-[#114b9c] text-white rounded-full px-5 py-2 text-sm font-bold no-underline transition-all">
-                <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
-            </a>
-            <a href="/login" class="flex items-center bg-[#0d47a1] hover:bg-[#082e6b] text-white rounded-full px-6 py-2 text-sm font-bold no-underline transition-all">
-                Đăng nhập
-            </a>
+      @if (hienThiGoiY && danhSachGoiY.length > 0) {
+      <div class="absolute top-full mt-2 left-0 w-full bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden z-50">
+        <div class="px-4 py-2 bg-gray-50/50 border-b border-gray-50 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+          Gợi ý sản phẩm
         </div>
+        <div class="max-h-[320px] overflow-y-auto custom-scrollbar">
+          @for (thuoc of danhSachGoiY; track thuoc.maThuoc) {
+          <div (click)="chonGoiY(thuoc)" class="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer transition-colors border-b border-gray-50 last:border-0 group">
+            <img [src]="thuoc.hinhAnh" (error)="$event.target.src='https://via.placeholder.com/100'" class="w-12 h-12 object-contain p-1 bg-white rounded-lg border border-gray-100 group-hover:border-blue-200 transition-colors">
+            <div class="flex-1">
+              <h4 class="text-sm font-bold text-gray-800 line-clamp-1 group-hover:text-blue-600 transition-colors">{{ thuoc.tenThuoc }}</h4>
+              <span class="text-xs text-blue-600 font-black block mt-0.5">{{ thuoc.giaBan | number }}đ</span>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      } @else if (hienThiGoiY && tuKhoaTimKiem.length > 0 && danhSachGoiY.length === 0) {
+      <div class="absolute top-full mt-2 left-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-6 z-50 text-center">
+        <i class="fas fa-search-minus text-3xl text-gray-200 mb-2"></i>
+        <p class="text-sm text-gray-500">Không tìm thấy kết quả cho <strong class="text-gray-800">"{{tuKhoaTimKiem}}"</strong></p>
+        <p class="text-[11px] text-gray-400 mt-1">Vui lòng thử lại với từ khóa khác.</p>
+      </div>
+      }
     </div>
+
+    <div class="flex gap-3">
+      <a href="/cart" class="flex items-center gap-2 bg-[#155fc2] hover:bg-[#114b9c] text-white rounded-full px-5 py-2 text-sm font-bold no-underline transition-all">
+        <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+      </a>
+      <a href="/login" class="flex items-center bg-[#0d47a1] hover:bg-[#082e6b] text-white rounded-full px-6 py-2 text-sm font-bold no-underline transition-all">
+        Đăng nhập
+      </a>
+    </div>
+  </div>
 </header>
+<nav class="bg-white border-b shadow-sm sticky top-[68px] z-40">
+  <div class="max-w-6xl mx-auto flex justify-between px-4 relative">
 
-<nav class="bg-white border-b shadow-sm relative z-40">
-  <div class="max-w-6xl mx-auto flex justify-between px-4">
-
-    <div class="group relative">
-      <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thực phẩm chức năng' }" class="py-3 px-2 text-sm font-semibold text-gray-700 group-hover:text-blue-600 no-underline flex items-center gap-1 cursor-pointer h-full">
-        Thực phẩm chức năng <i class="fas fa-chevron-down text-[10px] transition-transform group-hover:rotate-180"></i>
+    <div class="menu-item relative">
+      <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thực phẩm chức năng' }" class="py-3 px-2 text-sm font-semibold text-gray-700 hover:text-blue-600 no-underline flex items-center gap-1 cursor-pointer transition-colors">
+        Thực phẩm chức năng <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
       </a>
-      <div class="absolute left-0 top-full w-64 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 p-5 mt-1">
-        <a [routerLink]="['/category']" [queryParams]="{ tag: 'Vitamin & Khoáng chất' }" class="block text-blue-500 font-bold mb-3 hover:underline">Vitamin & Khoáng chất</a>
-        <div class="space-y-3">
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Miễn dịch - Đề kháng' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Miễn dịch - Đề kháng</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tiêu hóa' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Tiêu hóa</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tim mạch - Huyết áp' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Tim mạch - Huyết áp</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Đường huyết - Tiểu đường' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Đường huyết - Tiểu đường</a>
+      <div class="dropdown-panel min-w-max">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 min-w-[240px] whitespace-nowrap">
+          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Vitamin & Khoáng chất' }" class="block text-[#0084ff] font-black text-sm mb-3 no-underline hover:underline">Vitamin & Khoáng chất</a>
+          <div class="space-y-3.5 pl-1">
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Miễn dịch - Đề kháng' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Miễn dịch - Đề kháng</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tiêu hóa' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Tiêu hóa</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tim mạch - Huyết áp' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Tim mạch - Huyết áp</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Đường huyết - Tiểu đường' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Đường huyết - Tiểu đường</a>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="group relative">
-      <a [routerLink]="['/category']" [queryParams]="{ tag: 'Dược mỹ phẩm' }" class="py-3 px-2 text-sm font-semibold text-gray-700 group-hover:text-blue-600 no-underline flex items-center gap-1 cursor-pointer h-full">
-        Dược mỹ phẩm <i class="fas fa-chevron-down text-[10px] transition-transform group-hover:rotate-180"></i>
+    <div class="menu-item relative">
+      <a [routerLink]="['/category']" [queryParams]="{ tag: 'Dược mỹ phẩm' }" class="py-3 px-2 text-sm font-semibold text-gray-700 hover:text-blue-600 no-underline flex items-center gap-1 cursor-pointer transition-colors">
+        Dược mỹ phẩm <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
       </a>
-      <div class="absolute left-0 top-full w-64 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 p-5 mt-1">
-        <a [routerLink]="['/category']" [queryParams]="{ tag: 'Chăm sóc da mặt' }" class="block text-blue-500 font-bold mb-3 hover:underline">Chăm sóc da mặt</a>
-        <div class="space-y-3">
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Chăm sóc cơ thể' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Chăm sóc cơ thể</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Chăm sóc tóc - da đầu' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Chăm sóc tóc - da đầu</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Mỹ phẩm trang điểm' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Mỹ phẩm trang điểm</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Giải pháp làn da' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Giải pháp làn da</a>
+      <div class="dropdown-panel min-w-max">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 min-w-[240px] whitespace-nowrap">
+          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Chăm sóc da mặt' }" class="block text-[#0084ff] font-black text-sm mb-3 no-underline hover:underline">Chăm sóc da mặt</a>
+          <div class="space-y-3.5 pl-1">
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Chăm sóc cơ thể' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Chăm sóc cơ thể</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Chăm sóc tóc - da đầu' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Chăm sóc tóc - da đầu</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Mỹ phẩm trang điểm' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Mỹ phẩm trang điểm</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Giải pháp làn da' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Giải pháp làn da</a>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="group relative">
-      <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thuốc' }" class="py-3 px-2 text-sm font-semibold text-gray-700 group-hover:text-blue-600 no-underline flex items-center gap-1 cursor-pointer h-full">
-        Thuốc <i class="fas fa-chevron-down text-[10px] transition-transform group-hover:rotate-180"></i>
+    <div class="menu-item relative">
+      <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thuốc' }" class="py-3 px-2 text-sm font-semibold text-gray-700 hover:text-blue-600 no-underline flex items-center gap-1 cursor-pointer transition-colors">
+        Thuốc <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
       </a>
-      <div class="absolute left-0 top-full w-72 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 p-5 mt-1">
-        <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thuốc bổ, vitamin và khoáng chất' }" class="block text-blue-500 font-bold mb-3 hover:underline">Thuốc bổ, vitamin và khoáng chất</a>
-        <div class="space-y-3 grid grid-cols-2 gap-x-2">
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tiêu hóa, gan mật' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium mt-3">Tiêu hóa, gan mật</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tim mạch, tiểu đường' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Tim mạch, tiểu đường</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Xương khớp, gout' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Xương khớp, gout</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thần kinh, não bộ' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Thần kinh, não bộ</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Da liễu, dị ứng' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Da liễu, dị ứng</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Mắt, tai mũi họng' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Mắt, tai mũi họng</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tiết niệu, sinh dục' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Tiết niệu, sinh dục</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Giảm đau, hạ sốt' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Giảm đau, hạ sốt</a>
+      <div class="dropdown-panel min-w-max">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 min-w-[400px] whitespace-nowrap">
+          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thuốc bổ, vitamin và khoáng chất' }" class="block text-[#0084ff] font-black text-sm mb-3 no-underline hover:underline">Thuốc bổ, vitamin & khoáng</a>
+          <div class="space-y-3.5 pl-1 grid grid-cols-2 gap-x-6">
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tiêu hóa, gan mật' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors mt-3.5">Tiêu hóa, gan mật</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tim mạch, tiểu đường' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Tim mạch, tiểu đường</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Xương khớp, gout' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Xương khớp, gout</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thần kinh, não bộ' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Thần kinh, não bộ</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Da liễu, dị ứng' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Da liễu, dị ứng</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Mắt, tai mũi họng' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Mắt, tai mũi họng</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tiết niệu, sinh dục' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Tiết niệu, sinh dục</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Giảm đau, hạ sốt' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Giảm đau, hạ sốt</a>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="group relative">
-      <a [routerLink]="['/category']" [queryParams]="{ tag: 'Chăm sóc cá nhân' }" class="py-3 px-2 text-sm font-semibold text-gray-700 group-hover:text-blue-600 no-underline flex items-center gap-1 cursor-pointer h-full">
-        Chăm sóc cá nhân <i class="fas fa-chevron-down text-[10px] transition-transform group-hover:rotate-180"></i>
+    <div class="menu-item relative">
+      <a [routerLink]="['/category']" [queryParams]="{ tag: 'Chăm sóc cá nhân' }" class="py-3 px-2 text-sm font-semibold text-gray-700 hover:text-blue-600 no-underline flex items-center gap-1 cursor-pointer transition-colors">
+        Chăm sóc cá nhân <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
       </a>
-      <div class="absolute left-0 top-full w-64 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 p-5 mt-1">
-        <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thực phẩm - Đồ uống' }" class="block text-blue-500 font-bold mb-3 hover:underline">Thực phẩm - Đồ uống</a>
-        <div class="space-y-3">
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Vệ sinh cá nhân' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Vệ sinh cá nhân</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Chăm sóc răng miệng' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Chăm sóc răng miệng</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Đồ dùng gia đình' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Đồ dùng gia đình</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thiết bị làm đẹp' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Thiết bị làm đẹp</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tinh dầu các loại' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Tinh dầu các loại</a>
+      <div class="dropdown-panel min-w-max">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 min-w-[240px] whitespace-nowrap">
+          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thực phẩm - Đồ uống' }" class="block text-[#0084ff] font-black text-sm mb-3 no-underline hover:underline">Thực phẩm - Đồ uống</a>
+          <div class="space-y-3.5 pl-1">
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Vệ sinh cá nhân' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Vệ sinh cá nhân</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Chăm sóc răng miệng' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Chăm sóc răng miệng</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Đồ dùng gia đình' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Đồ dùng gia đình</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thiết bị làm đẹp' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Thiết bị làm đẹp</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Tinh dầu các loại' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Tinh dầu các loại</a>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="group relative">
-      <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thiết bị y tế' }" class="py-3 px-2 text-sm font-semibold text-gray-700 group-hover:text-blue-600 no-underline flex items-center gap-1 cursor-pointer h-full">
-        Thiết bị và Vật tư y tế <i class="fas fa-chevron-down text-[10px] transition-transform group-hover:rotate-180"></i>
+    <div class="menu-item relative">
+      <a [routerLink]="['/category']" [queryParams]="{ tag: 'Thiết bị y tế' }" class="py-3 px-2 text-sm font-semibold text-gray-700 hover:text-blue-600 no-underline flex items-center gap-1 cursor-pointer transition-colors">
+        Thiết bị và Vật tư y tế <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
       </a>
-      <div class="absolute right-0 top-full w-64 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 p-5 mt-1">
-        <a [routerLink]="['/category']" [queryParams]="{ tag: 'Dụng cụ y tế' }" class="block text-blue-500 font-bold mb-3 hover:underline">Dụng cụ y tế</a>
-        <div class="space-y-3">
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Dụng cụ theo dõi' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Dụng cụ theo dõi</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Dụng cụ sơ cứu' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Dụng cụ sơ cứu</a>
-          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Khẩu trang' }" class="block text-sm text-gray-800 hover:text-blue-600 font-medium">Khẩu trang</a>
+      <div class="dropdown-panel min-w-max right-0" style="left: auto;">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 min-w-[240px] whitespace-nowrap">
+          <a [routerLink]="['/category']" [queryParams]="{ tag: 'Dụng cụ y tế' }" class="block text-[#0084ff] font-black text-sm mb-3 no-underline hover:underline">Dụng cụ y tế</a>
+          <div class="space-y-3.5 pl-1">
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Dụng cụ theo dõi' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Dụng cụ theo dõi</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Dụng cụ sơ cứu' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Dụng cụ sơ cứu</a>
+            <a [routerLink]="['/category']" [queryParams]="{ tag: 'Khẩu trang' }" class="block text-xs text-gray-800 font-bold no-underline hover:text-blue-600 transition-colors">Khẩu trang</a>
+          </div>
         </div>
       </div>
     </div>
@@ -120,5 +178,5 @@
 </nav>
 
 <main class="min-h-screen bg-gray-50 pb-10">
-    <router-outlet></router-outlet>
+  <router-outlet></router-outlet>
 </main>

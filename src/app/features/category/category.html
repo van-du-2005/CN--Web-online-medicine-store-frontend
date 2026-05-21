@@ -2,9 +2,16 @@
 
   <div class="bg-white border-b border-gray-100 py-4 shadow-sm">
     <div class="max-w-6xl mx-auto px-4">
+
       <div class="flex items-center gap-2 text-xs text-gray-400 mb-3">
         <i class="fas fa-home"></i>
         <a routerLink="/" class="hover:text-blue-600 no-underline text-gray-400 transition-colors">Trang chủ</a>
+
+        @if (danhMucCha && danhMucCha !== tieuDeTrang) {
+        <span>/</span>
+        <a [routerLink]="['/category']" [queryParams]="{ tag: danhMucCha }" class="hover:text-blue-600 no-underline text-gray-400 transition-colors">{{ danhMucCha }}</a>
+        }
+
         <span>/</span>
         <span class="text-gray-800 font-bold">{{ tieuDeTrang }}</span>
       </div>
@@ -39,15 +46,19 @@
       <div class="w-full md:w-1/4">
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-8 sticky top-24 h-fit">
 
+          @if (danhMucSidebar.length > 0) {
           <div>
             <h4 class="font-bold text-gray-800 text-base mb-4">Danh mục sản phẩm</h4>
             <div class="space-y-3">
-              <label class="flex items-center gap-3 text-sm text-gray-600 cursor-pointer group">
-                <input type="checkbox" checked class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-0">
-                <span class="group-hover:text-blue-600 transition-colors font-semibold text-blue-600">Vitamin & Khoáng chất</span>
-              </label>
+              @for (dm of danhMucSidebar; track dm) {
+              <a [routerLink]="['/category']" [queryParams]="{ tag: dm }" class="flex items-center gap-3 text-sm text-gray-600 cursor-pointer group no-underline">
+                <input type="radio" [checked]="tagHienTai === dm" class="w-4 h-4 border-gray-300 text-blue-600 focus:ring-0 cursor-pointer pointer-events-none">
+                <span class="group-hover:text-blue-600 transition-colors" [class.font-bold]="tagHienTai === dm" [class.text-blue-600]="tagHienTai === dm">{{ dm }}</span>
+              </a>
+              }
             </div>
           </div>
+          }
 
           <div>
             <h4 class="font-bold text-gray-800 text-base mb-4">Khoảng giá</h4>
@@ -116,7 +127,7 @@
             </div>
 
             <a [routerLink]="['/product/detail', thuoc.maThuoc]"
-               class="w-full bg-white border-2 border-blue-500 text-blue-600 font-bold py-2.5 rounded-full text-xs text-center no-underline hover:bg-blue-500 hover:text-white transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
+               class="w-full bg-white border-2 border-blue-500 text-blue-600 font-bold py-2.5 rounded-full text-xs text-center no-underline hover:!bg-blue-500 hover:!border-blue-500 hover:!text-white transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
               <i class="fas fa-plus text-[10px]"></i> Chọn mua
             </a>
           </div>

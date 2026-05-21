@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // Bắt buộc phải có để đọc dữ liệu form
+import { FormsModule } from '@angular/forms';
 import { ThuocService, Thuoc } from '../../services/thuoc';
 
 @Component({
@@ -14,15 +14,25 @@ export class CategoryComponent implements OnInit {
   tatCaThuoc: Thuoc[] = [];
   danhSachThuoc: Thuoc[] = [];
   isLoading = true;
-  tieuDeTrang = 'Thực phẩm chức năng';
+  tieuDeTrang = 'Sản phẩm';
 
-  // Các biến lưu trạng thái bộ lọc
   tuKhoaHienTai = '';
   tagHienTai = '';
   sapXep = '';
   locGia = '';
   giaTu: number | null = null;
   giaDen: number | null = null;
+
+  danhMucSidebar: string[] = [];
+  danhMucCha = ''; // THÊM BIẾN NÀY để lưu tên nhóm mẹ (VD: Thực phẩm chức năng)
+
+  cayDanhMuc: any = {
+    'Thực phẩm chức năng': ['Vitamin & Khoáng chất', 'Miễn dịch - Đề kháng', 'Tiêu hóa', 'Tim mạch - Huyết áp', 'Đường huyết - Tiểu đường'],
+    'Dược mỹ phẩm': ['Chăm sóc da mặt', 'Chăm sóc cơ thể', 'Chăm sóc tóc - da đầu', 'Mỹ phẩm trang điểm', 'Giải pháp làn da'],
+    'Thuốc': ['Thuốc bổ, vitamin và khoáng chất', 'Tiêu hóa, gan mật', 'Tim mạch, tiểu đường', 'Xương khớp, gout', 'Thần kinh, não bộ', 'Da liễu, dị ứng', 'Mắt, tai mũi họng', 'Tiết niệu, sinh dục', 'Giảm đau, hạ sốt'],
+    'Chăm sóc cá nhân': ['Thực phẩm - Đồ uống', 'Vệ sinh cá nhân', 'Chăm sóc răng miệng', 'Đồ dùng gia đình', 'Thiết bị làm đẹp', 'Tinh dầu các loại'],
+    'Thiết bị y tế': ['Dụng cụ y tế', 'Dụng cụ theo dõi', 'Dụng cụ sơ cứu', 'Khẩu trang']
+  };
 
   private thuocService = inject(ThuocService);
   private route = inject(ActivatedRoute);
@@ -40,13 +50,18 @@ export class CategoryComponent implements OnInit {
 
           if (this.tuKhoaHienTai) {
             this.tieuDeTrang = `Kết quả tìm kiếm: "${this.tuKhoaHienTai}"`;
+            this.danhMucSidebar = [];
+            this.danhMucCha = '';
           } else if (this.tagHienTai) {
             this.tieuDeTrang = this.tagHienTai;
+            this.capNhatSidebar(this.tagHienTai);
           } else {
-            this.tieuDeTrang = 'Thực phẩm chức năng';
+            this.tieuDeTrang = 'Tất cả sản phẩm';
+            this.danhMucSidebar = [];
+            this.danhMucCha = '';
           }
 
-          this.apDungBoLoc(); // Tự động lọc khi vừa vào trang
+          this.apDungBoLoc();
         });
       },
       error: (err) => {
@@ -57,16 +72,25 @@ export class CategoryComponent implements OnInit {
     });
   }
 
-  // Thuật toán lọc
+  capNhatSidebar(tag: string) {
+    for (const [key, values] of Object.entries(this.cayDanhMuc)) {
+      if (key === tag || (values as string[]).includes(tag)) {
+        this.danhMucSidebar = values as string[];
+        this.danhMucCha = key; // LƯU LẠI NHÓM MẸ để hiện lên Breadcrumb
+        return;
+      }
+    }
+    this.danhMucSidebar = [];
+    this.danhMucCha = '';
+  }
+
   apDungBoLoc() {
     let ketQua = [...this.tatCaThuoc];
 
-    // 1. Lọc theo từ khóa tìm kiếm
     if (this.tuKhoaHienTai) {
       ketQua = ketQua.filter(t => t.tenThuoc.toLowerCase().includes(this.tuKhoaHienTai.toLowerCase()));
     }
 
-    // 2. Lọc theo khoảng giá
     if (this.locGia === 'duoi100') {
       ketQua = ketQua.filter(t => t.giaBan < 100000);
     } else if (this.locGia === '100-300') {
@@ -79,7 +103,6 @@ export class CategoryComponent implements OnInit {
       ketQua = ketQua.filter(t => t.giaBan >= min && t.giaBan <= max);
     }
 
-    // 3. Sắp xếp giá
     if (this.sapXep === 'asc') {
       ketQua.sort((a, b) => a.giaBan - b.giaBan);
     } else if (this.sapXep === 'desc') {
