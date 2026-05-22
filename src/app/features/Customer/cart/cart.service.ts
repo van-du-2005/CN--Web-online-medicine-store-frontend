@@ -44,4 +44,12 @@ export class CartService {
       withCredentials: true
     });
   }
+
+  addToCart(productId: string, quantity: number): Observable<any> {
+    const body = { productId, quantity };
+    return this.http.post<any>(`${this.apiUrl}/add`, body, {
+      headers: this.getAuthHeaders(),
+      withCredentials: true
+    });
+  }
 }

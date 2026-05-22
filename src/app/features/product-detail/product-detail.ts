@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CartService } from '../Customer/cart/cart.service';
 @Component({
   selector: 'app-product-detail',
   standalone: true,
@@ -17,12 +18,13 @@ export class ProductDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
+  private cartService = inject(CartService);
 
   ngOnInit(): void {
     const maThuoc = this.route.snapshot.paramMap.get('id');
 
     if (maThuoc) {
-      this.http.get(`https://localhost:7245/api/Thuoc/${maThuoc}`).subscribe({
+      this.http.get(`http://localhost:5237/api/Thuoc/${maThuoc}`).subscribe({
         next: (data) => {
           this.thuoc = data;
           this.isLoading = false;
@@ -70,5 +72,28 @@ export class ProductDetailComponent implements OnInit {
     } else {
       this.soLuong = value;
     }
+  }
+
+  // Thêm sản phẩm vào giỏ hàng
+  themVaoGioHang() {
+    if (!this.thuoc || !this.thuoc.maThuoc) {
+      alert('Không thể thêm sản phẩm này vào giỏ hàng');
+      return;
+    }
+
+    this.cartService.addToCart(this.thuoc.maThuoc, this.soLuong).subscribe({
+      next: (res) => {
+        if (res.success) {
+          alert(`Đã thêm ${this.soLuong} ${this.thuoc.tenThuoc} vào giỏ hàng`);
+          this.soLuong = 1; // Reset số lượng
+        } else {
+          alert(res.message || 'Thêm vào giỏ hàng thất bại');
+        }
+      },
+      error: (err) => {
+        console.error('Lỗi thêm vào giỏ hàng:', err);
+        alert('Lỗi: Không thể thêm vào giỏ hàng. Vui lòng đăng nhập hoặc thử lại.');
+      }
+    });
   }
 }

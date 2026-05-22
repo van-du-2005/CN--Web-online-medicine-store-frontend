@@ -16,7 +16,7 @@ export interface Thuoc {
   providedIn: 'root'
 })
 export class ThuocService {
-  private apiUrl = 'https://localhost:7245/api/Thuoc';
+  private apiUrl = 'http://localhost:5237/api/Thuoc';
   private http = inject(HttpClient);
 
   getDanhSachThuoc(): Observable<Thuoc[]> {
