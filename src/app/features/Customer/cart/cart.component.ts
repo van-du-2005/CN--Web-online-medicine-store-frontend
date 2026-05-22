@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -22,6 +22,7 @@ export interface CartDtoUI {
 export class CartComponent implements OnInit {
   private cartService = inject(CartService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
   
   cartData: CartDtoUI = { items: [] };
   isLoading = true;
@@ -30,35 +31,11 @@ export class CartComponent implements OnInit {
     this.loadCart();
   }
 
-  // loadCart() {
-  //   this.isLoading = true;
-  //   this.cartService.getCart().subscribe({
-  //     next: (res) => {
-  //       this.cartData = {
-  //         items: (res?.data?.items || []).map((item: CartItem) => ({
-  //           ...item,
-  //           selected: true
-  //         }))
-  //       };
-  //       this.isLoading = false;
-  //     },
-  //     error: (err) => {
-  //       console.error('Lỗi tải giỏ hàng', err);
-  //       this.cartData = { items: [] };
-  //       this.isLoading = false;
-  //     }
-  //   });
-  // }
   loadCart() {
   this.isLoading = true;
-  console.log('=== BẮT ĐẦU LOAD CART ===');
   
   this.cartService.getCart().subscribe({
-    next: (res) => {
-      console.log('=== RESPONSE ===', res);         // Xem toàn bộ response
-      console.log('=== res.data ===', res?.data);   // Xem data
-      console.log('=== items ===', res?.data?.items); // Xem items
-      
+    next: (res) => {    
       this.cartData = {
         items: (res?.data?.items || []).map((item: CartItem) => ({
           ...item,
@@ -66,13 +43,12 @@ export class CartComponent implements OnInit {
         }))
       };
       this.isLoading = false;
-      console.log('=== cartData sau gán ===', this.cartData);
+      this.cdr.detectChanges();
     },
     error: (err) => {
-      console.error('=== LỖI API ===', err);
-      console.error('=== Status ===', err.status);
       this.cartData = { items: [] };
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   });
 }
@@ -111,7 +87,10 @@ export class CartComponent implements OnInit {
   private updateQuantityAPI(productId: string, quantity: number, item: CartItemUI) {
     this.cartService.updateQuantity(productId, quantity).subscribe({
       next: (res) => {
-        if (res.success) item.soLuong = quantity;
+        if (res.success) {
+          item.soLuong = quantity;
+          this.cdr.detectChanges();
+        }
       },
       error: (err) => alert('Cập nhật thất bại, có thể do vượt quá tồn kho.')
     });
@@ -125,6 +104,7 @@ export class CartComponent implements OnInit {
           if (res.success) {
             // Lọc sản phẩm bị xóa khỏi mảng hiện tại để UI tự update mà không cần load lại API GetCart
             this.cartData.items = this.cartData.items.filter(i => i.maThuoc !== productId);
+            this.cdr.detectChanges();
           }
         }
       });
