@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet, Router, RouterLink } from '@angular/router';
+// Bổ sung thêm NavigationEnd để quét đường link
+import { RouterOutlet, Router, RouterLink, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ThuocService, Thuoc } from './services/thuoc'; // Gọi kho dữ liệu thuốc
@@ -16,13 +17,31 @@ export class AppComponent implements OnInit {
   danhSachGoiY: Thuoc[] = []; // Chứa top 5 thuốc gần giống nhất
   hienThiGoiY = false;
 
+  // --- BỔ SUNG: Biến kiểm tra có phải trang Admin không ---
+  isAdminRoute = false;
+
   private router = inject(Router);
   private thuocService = inject(ThuocService);
 
+  // --- BỔ SUNG: Hàm lắng nghe đường link để giấu Menu/Footer ---
+  constructor() {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        // Nếu đường link có chứa chữ '/admin', biến này sẽ thành true
+        this.isAdminRoute = event.urlAfterRedirects.includes('/admin');
+      }
+    });
+  }
+
   ngOnInit() {
     // Tải sẵn danh sách thuốc ngay khi web vừa mở để phục vụ tìm kiếm nhanh
-    this.thuocService.getDanhSachThuoc().subscribe(data => {
-      this.tatCaThuoc = data;
+    this.thuocService.getDanhSachThuoc().subscribe({
+      next: (data) => {
+        this.tatCaThuoc = data;
+      },
+      error: (err) => {
+        console.error('Lỗi tải danh sách thuốc:', err);
+      }
     });
   }
 
