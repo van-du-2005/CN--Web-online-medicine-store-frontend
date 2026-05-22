@@ -39,19 +39,16 @@ export const routes: Routes = [
       { path: '', redirectTo: 'profile', pathMatch: 'full' }
     ]
   },
+
+  {
+    path: 'cart',
+    component: CartComponent
+  },
   
   { path: 'profile', redirectTo: 'account/profile', pathMatch: 'full' },
 
   { 
     // Tạm thời điều hướng trang chủ (localhost:4200) thẳng vào trang đăng nhập để dễ test
     path: '', redirectTo: 'auth/login', pathMatch: 'full' 
-  }
-];
-
-
-export const routes: Routes = [
-  {
-    path: 'cart',
-    component: CartComponent
   }
 ];
