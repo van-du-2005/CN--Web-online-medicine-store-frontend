@@ -1,6 +1,7 @@
 export interface OrderItemInterface {
   maThuoc: string;
   tenThuoc: string;
+  hinhAnh?: string;
   soLuong: number;
   donGia: number;
   tongTien: number;

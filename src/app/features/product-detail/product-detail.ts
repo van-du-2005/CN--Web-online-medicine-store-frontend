@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,6 +19,7 @@ export class ProductDetailComponent implements OnInit {
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
   private cartService = inject(CartService);
+  private router = inject(Router);
 
   ngOnInit(): void {
     const maThuoc = this.route.snapshot.paramMap.get('id');
@@ -95,5 +96,26 @@ export class ProductDetailComponent implements OnInit {
         alert('Lỗi: Không thể thêm vào giỏ hàng. Vui lòng đăng nhập hoặc thử lại.');
       }
     });
+  }
+
+  // Mua ngay: Thêm vào giỏ hàng rồi chuyển sang checkout
+  muaNgay() {
+    if (!this.thuoc || !this.thuoc.maThuoc) {
+      alert('Không thể mua sản phẩm này');
+      return;
+    }
+
+    // Lưu sản phẩm hiện tại vào sessionStorage cho checkout page
+    const cartItem = {
+      maThuoc: this.thuoc.maThuoc,
+      tenThuoc: this.thuoc.tenThuoc,
+      soLuong: this.soLuong,
+      gia: this.thuoc.giaBan,
+      hinhAnh: this.thuoc.hinhAnh
+    };
+
+    sessionStorage.setItem('checkoutItems', JSON.stringify([cartItem]));
+    // Chuyển sang trang checkout
+    this.router.navigate(['/checkout']);
   }
 }
