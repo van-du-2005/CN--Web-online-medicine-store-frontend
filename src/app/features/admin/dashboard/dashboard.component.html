@@ -67,7 +67,7 @@
               <tr *ngFor="let p of topProducts" class="border-t border-slate-100 hover:bg-slate-50 transition-colors">
                 <td class="p-4 text-center font-medium text-slate-600">{{ p.stt }}</td>
                 <td class="p-4 flex items-center gap-3">
-                  <img [src]="p.hinhAnh" (error)="p.hinhAnh='/anh_mi_mac_dinh.png'" class="w-10 h-10 object-cover rounded-lg border border-slate-200">
+                  <img [src]="p.hinhAnh" (error)="p.hinhAnh='/anh_mac_dinh.png'" class="w-10 h-10 object-cover rounded-lg border border-slate-200">
                   <span class="font-medium text-slate-800 truncate max-w-[200px]" [title]="p.tenThuoc">{{ p.tenThuoc }}</span>
                 </td>
                 <td class="p-4 text-center font-medium text-slate-700">{{ p.soLuongBan }}</td>
@@ -114,7 +114,7 @@
 
           <div *ngFor="let item of lowStockData.items" class="flex justify-between items-center py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 px-2 rounded-lg transition-colors">
             <div class="flex items-center gap-3">
-              <img [src]="item.hinhAnh" (error)="item.hinhAnh='/anh_mi_mac_dinh.png'" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-sm">
+              <img [src]="item.hinhAnh" (error)="item.hinhAnh='/anh_mac_dinh.png'" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shadow-sm">
               <span class="text-sm font-semibold text-slate-800 truncate max-w-[200px]" [title]="item.tenThuoc">{{ item.tenThuoc }}</span>
             </div>
             <span class="bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full shadow-sm">{{ item.tonKhoHienTai }}</span>

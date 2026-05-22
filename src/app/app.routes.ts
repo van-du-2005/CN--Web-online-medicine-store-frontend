@@ -14,6 +14,7 @@ import { OrdersComponent } from './features/account/orders/orders.component';
 import { AddressesComponent } from './features/account/addresses/addresses.component';
 import { AdminLayoutComponent } from '../app/layouts/admin/admin-layout.component';
 import { DashboardComponent } from './features/admin/dashboard/dashboard.component';
+import { OrdersAdminComponent } from './features/admin/orders/orders-admin.component';
 
 export const routes: Routes = [
   {
@@ -46,6 +47,7 @@ export const routes: Routes = [
     component: AdminLayoutComponent,
     children: [
       { path: 'dashboard', component: DashboardComponent },
+      { path: 'orders', component: OrdersAdminComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

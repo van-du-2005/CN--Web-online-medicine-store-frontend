@@ -1,0 +1,380 @@
+<div class="h-full flex flex-col lg:flex-row gap-6 font-sans text-slate-800">
+  <div
+    class="w-full lg:w-5/12 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col h-[calc(100vh-120px)] relative"
+  >
+    <div class="flex flex-wrap gap-2 mb-4 pb-3 border-b border-slate-100 relative">
+      <div
+        *ngIf="isLoadingCounts"
+        class="absolute inset-0 bg-white/60 z-10 flex items-center justify-center"
+      >
+        <i class="fa-solid fa-spinner fa-spin text-blue-600"></i>
+      </div>
+
+      <button
+        (click)="loadOrders('TatCa', 1)"
+        [ngClass]="
+          currentFilter === 'TatCa'
+            ? 'bg-blue-50 border-blue-200 text-blue-700'
+            : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-600'
+        "
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-colors cursor-pointer outline-none"
+      >
+        Tất cả
+        <span
+          [ngClass]="
+            currentFilter === 'TatCa' ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'
+          "
+          class="px-2 py-0.5 rounded-full text-xs transition-colors"
+          >{{ counts.tatCa }}</span
+        >
+      </button>
+      <button
+        (click)="loadOrders('ChoXacNhan', 1)"
+        [ngClass]="
+          currentFilter === 'ChoXacNhan'
+            ? 'bg-amber-50 border-amber-200 text-amber-700'
+            : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-600'
+        "
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-colors cursor-pointer outline-none"
+      >
+        Chờ xử lý
+        <span
+          [ngClass]="
+            currentFilter === 'ChoXacNhan'
+              ? 'bg-amber-500 text-white'
+              : 'bg-amber-100 text-amber-700'
+          "
+          class="px-2 py-0.5 rounded-full text-xs transition-colors"
+          >{{ counts.choXacNhan }}</span
+        >
+      </button>
+      <button
+        (click)="loadOrders('DangXuLy', 1)"
+        [ngClass]="
+          currentFilter === 'DangXuLy'
+            ? 'bg-blue-50 border-blue-200 text-blue-700'
+            : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-600'
+        "
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-colors cursor-pointer outline-none"
+      >
+        Đang xử lý
+        <span
+          [ngClass]="
+            currentFilter === 'DangXuLy' ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700'
+          "
+          class="px-2 py-0.5 rounded-full text-xs transition-colors"
+          >{{ counts.dangXuLy }}</span
+        >
+      </button>
+      <button
+        (click)="loadOrders('DangGiao', 1)"
+        [ngClass]="
+          currentFilter === 'DangGiao'
+            ? 'bg-cyan-50 border-cyan-200 text-cyan-700'
+            : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-600'
+        "
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-colors cursor-pointer outline-none"
+      >
+        Đang giao
+        <span
+          [ngClass]="
+            currentFilter === 'DangGiao' ? 'bg-cyan-500 text-white' : 'bg-cyan-100 text-cyan-700'
+          "
+          class="px-2 py-0.5 rounded-full text-xs transition-colors"
+          >{{ counts.dangGiao }}</span
+        >
+      </button>
+      <button
+        (click)="loadOrders('DaGiao', 1)"
+        [ngClass]="
+          currentFilter === 'DaGiao'
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+            : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-600'
+        "
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-colors cursor-pointer outline-none"
+      >
+        Hoàn thành
+        <span
+          [ngClass]="
+            currentFilter === 'DaGiao'
+              ? 'bg-emerald-500 text-white'
+              : 'bg-emerald-100 text-emerald-700'
+          "
+          class="px-2 py-0.5 rounded-full text-xs transition-colors"
+          >{{ counts.daGiao }}</span
+        >
+      </button>
+      <button
+        (click)="loadOrders('DaHuy', 1)"
+        [ngClass]="
+          currentFilter === 'DaHuy'
+            ? 'bg-red-50 border-red-200 text-red-700'
+            : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-600'
+        "
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-colors cursor-pointer outline-none"
+      >
+        Đã hủy
+        <span
+          [ngClass]="
+            currentFilter === 'DaHuy' ? 'bg-red-500 text-white' : 'bg-red-100 text-red-700'
+          "
+          class="px-2 py-0.5 rounded-full text-xs transition-colors"
+          >{{ counts.daHuy }}</span
+        >
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto pr-2 relative hide-scrollbar">
+      <div
+        *ngIf="isLoadingList"
+        class="absolute inset-0 bg-white/70 z-10 flex items-center justify-center backdrop-blur-[1px]"
+      >
+        <i class="fa-solid fa-spinner fa-spin text-3xl text-blue-600"></i>
+      </div>
+
+      <div *ngIf="!isLoadingList && orders.length === 0" class="text-center py-10">
+        <i class="fa-solid fa-box-open text-4xl text-slate-300 mb-3"></i>
+        <p class="text-slate-500">Không có đơn hàng nào</p>
+      </div>
+
+      <div
+        *ngFor="let item of orders"
+        (click)="loadDetail(item.maDonHang)"
+        [ngClass]="
+          selectedOrder?.maDonHang === item.maDonHang
+            ? 'border-blue-500 bg-blue-50'
+            : 'border-slate-200 bg-white hover:border-blue-400 hover:shadow-md'
+        "
+        class="p-4 mb-3 border rounded-xl cursor-pointer transition-all duration-200 group"
+      >
+        <div class="flex items-center">
+          <div
+            class="w-10 h-10 rounded-full flex items-center justify-center text-white mr-3 opacity-90 transition-transform group-hover:scale-110"
+            [style.backgroundColor]="item.colorCode"
+          >
+            <i class="fa-solid fa-cart-shopping text-sm"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-bold text-slate-800">{{ item.maDonHang }}</div>
+            <div class="text-slate-500 text-sm truncate">{{ item.tenKhachHang }}</div>
+            <div class="text-slate-400 text-xs mt-0.5">{{ item.ngayDatFormat }}</div>
+          </div>
+          <div class="text-right ml-2 flex flex-col items-end">
+            <div class="font-bold text-slate-800 mb-1.5">
+              {{ item.tongTien | number: '1.0-0' }}đ
+            </div>
+            <span
+              class="px-2.5 py-1 rounded-full text-[11px] font-semibold border"
+              [style.color]="item.colorCode"
+              [style.backgroundColor]="item.colorCode + '15'"
+              [style.borderColor]="item.colorCode + '30'"
+            >
+              {{ item.trangThaiLabel }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="totalPages > 1"
+      class="mt-4 pt-4 border-t border-slate-100 flex justify-center gap-1.5"
+    >
+      <button
+        (click)="loadOrders(currentFilter, currentPage - 1)"
+        [disabled]="currentPage === 1"
+        class="w-8 h-8 rounded border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50 cursor-pointer transition-colors outline-none"
+      >
+        <i class="fa-solid fa-angle-left"></i>
+      </button>
+      <button
+        *ngFor="let p of getPagesArray()"
+        (click)="loadOrders(currentFilter, p)"
+        [class.bg-blue-600]="p === currentPage"
+        [class.text-white]="p === currentPage"
+        [class.border-blue-600]="p === currentPage"
+        class="w-8 h-8 rounded border border-slate-200 flex items-center justify-center text-sm font-medium text-slate-600 hover:bg-blue-50 hover:text-blue-600 cursor-pointer transition-colors outline-none"
+      >
+        {{ p }}
+      </button>
+      <button
+        (click)="loadOrders(currentFilter, currentPage + 1)"
+        [disabled]="currentPage === totalPages"
+        class="w-8 h-8 rounded border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50 cursor-pointer transition-colors outline-none"
+      >
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div
+    class="w-full lg:w-7/12 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col h-[calc(100vh-120px)] relative"
+  >
+    <div
+      *ngIf="!selectedOrder && !isLoadingDetail"
+      class="h-full flex flex-col items-center justify-center text-slate-400"
+    >
+      <i class="fa-solid fa-inbox text-6xl mb-4 opacity-30"></i>
+      <p>Chọn một đơn hàng bên trái để xem chi tiết</p>
+    </div>
+
+    <div
+      *ngIf="isLoadingDetail"
+      class="absolute inset-0 bg-white/70 z-20 flex items-center justify-center backdrop-blur-sm rounded-2xl"
+    >
+      <i class="fa-solid fa-spinner fa-spin text-4xl text-blue-600"></i>
+    </div>
+
+    <ng-container *ngIf="selectedOrder && !isLoadingDetail">
+      <div class="flex justify-between items-start border-b border-slate-100 pb-4 mb-4">
+        <h5 class="font-bold text-lg text-blue-700 flex items-center gap-2 m-0">
+          <i class="fa-solid fa-file-invoice"></i> CHI TIẾT ĐƠN HÀNG
+        </h5>
+        <div class="text-right">
+          <div class="font-bold text-slate-800">
+            Mã đơn: {{ selectedOrder.maDonHang }}
+            <i
+              class="fa-regular fa-copy ml-1 cursor-pointer text-slate-400 hover:text-blue-600 transition-colors"
+            ></i>
+          </div>
+          <div class="text-sm text-slate-500 mt-0.5">
+            Ngày cập nhật: {{ selectedOrder.ngayDatFormat }}
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <h6 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-user text-slate-400"></i> Thông tin khách hàng
+          </h6>
+          <div class="flex mb-2 text-sm">
+            <span class="text-slate-500 w-24 flex-shrink-0">Họ tên:</span>
+            <span class="font-medium text-slate-800">{{ selectedOrder.hoTen }}</span>
+          </div>
+          <div class="flex mb-2 text-sm">
+            <span class="text-slate-500 w-24 flex-shrink-0">Điện thoại:</span>
+            <span class="font-medium text-slate-800">{{ selectedOrder.soDienThoai }}</span>
+          </div>
+          <div class="flex mb-2 text-sm">
+            <span class="text-slate-500 w-24 flex-shrink-0">Địa chỉ:</span>
+            <span class="font-medium text-slate-800 leading-relaxed">{{
+              selectedOrder.diaChi
+            }}</span>
+          </div>
+        </div>
+
+        <div>
+          <h6 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-truck-fast text-slate-400"></i> Trạng thái đơn hàng
+          </h6>
+          <select
+            [(ngModel)]="newStatus"
+            [disabled]="isReadonlyStatus() || isSaving"
+            class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 outline-none focus:border-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed cursor-pointer transition-colors"
+          >
+            <option value="ChoXacNhan">🟡 Chờ xử lý</option>
+            <option value="DangXuLy">🔵 Đang xử lý</option>
+            <option value="DangGiao">🟣 Đang giao</option>
+            <option value="DaGiao">🟢 Hoàn thành</option>
+            <option value="DaHuy">🔴 Đã hủy</option>
+          </select>
+
+          <h6 class="font-bold text-slate-800 mb-2 text-sm">Phương thức thanh toán</h6>
+          <p class="text-slate-600 text-sm mb-4">
+            <i class="fa-solid fa-money-bill-wave text-slate-400 mr-1.5"></i
+            >{{ selectedOrder.phuongThucThanhToan }}
+          </p>
+        </div>
+      </div>
+
+      <h6 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+        <i class="fa-solid fa-box text-slate-400"></i> Danh sách sản phẩm
+      </h6>
+
+      <div
+        class="flex-1 overflow-y-auto border border-slate-200 rounded-xl hide-scrollbar relative"
+      >
+        <table class="w-full text-left text-sm whitespace-nowrap">
+          <thead class="bg-slate-50 text-slate-500 sticky top-0 z-10 shadow-sm">
+            <tr>
+              <th class="py-3 px-4 font-semibold w-12 text-center">STT</th>
+              <th class="py-3 px-4 font-semibold">Sản phẩm</th>
+              <th class="py-3 px-4 font-semibold text-center">Đơn giá</th>
+              <th class="py-3 px-4 font-semibold text-center w-20">SL</th>
+              <th class="py-3 px-4 font-semibold text-right">Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let p of selectedOrder.sanPhams"
+              class="border-b border-slate-100 hover:bg-slate-50 transition-colors last:border-0"
+            >
+              <td class="py-3 px-4 text-center text-slate-500">{{ p.stt }}</td>
+              <td class="py-3 px-4 flex items-center gap-3">
+                <img
+                  [src]="p.hinhAnh"
+                  (error)="p.hinhAnh = '/anh_mac_dinh.png'"
+                  class="w-10 h-10 object-cover rounded-lg border border-slate-200"
+                />
+                <span
+                  class="font-medium text-slate-800 truncate max-w-[200px]"
+                  [title]="p.tenThuoc"
+                  >{{ p.tenThuoc }}</span
+                >
+              </td>
+              <td class="py-3 px-4 text-center text-slate-700">
+                {{ p.donGia | number: '1.0-0' }}đ
+              </td>
+              <td class="py-3 px-4 text-center font-medium text-slate-800">{{ p.soLuong }}</td>
+              <td class="py-3 px-4 text-right font-bold text-slate-800">
+                {{ p.thanhTien | number: '1.0-0' }}đ
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-end pt-4 mt-4 border-t border-slate-100">
+        <div class="w-64 space-y-2.5">
+          <div class="flex justify-between text-sm text-slate-500">
+            <span>Tạm tính</span>
+            <span class="text-slate-800 font-medium"
+              >{{ selectedOrder.tamTinh | number: '1.0-0' }}đ</span
+            >
+          </div>
+          <div class="flex justify-between text-sm text-slate-500">
+            <span>Phí vận chuyển</span>
+            <span class="text-slate-800 font-medium"
+              >{{ selectedOrder.phiVanChuyen | number: '1.0-0' }}đ</span
+            >
+          </div>
+          <div
+            *ngIf="selectedOrder.giamGia > 0"
+            class="flex justify-between text-sm text-emerald-600 font-medium"
+          >
+            <span>Giảm giá</span> <span>-{{ selectedOrder.giamGia | number: '1.0-0' }}đ</span>
+          </div>
+          <div class="flex justify-between items-center pt-2 border-t border-slate-100 mt-2">
+            <span class="font-bold text-slate-800">Tổng tiền</span>
+            <span class="text-xl font-bold text-blue-600"
+              >{{ selectedOrder.tongTien | number: '1.0-0' }}đ</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-5 pt-4 border-t border-slate-100">
+        <button
+          *ngIf="!isReadonlyStatus()"
+          (click)="saveStatus()"
+          [disabled]="isSaving || newStatus === selectedOrder.trangThai"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg transition-colors cursor-pointer shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed outline-none border-none"
+        >
+          <i *ngIf="isSaving" class="fa-solid fa-spinner fa-spin"></i>
+          <i *ngIf="!isSaving" class="fa-solid fa-check"></i> Lưu thay đổi
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</div>
