@@ -1,0 +1,42 @@
+<div class="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
+    
+    <aside class="w-full md:w-72 flex-shrink-0">
+      
+      <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-6 text-center relative overflow-hidden">
+        <div *ngIf="isLoading" class="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+          <i class="fa-solid fa-spinner fa-spin text-blue-600 text-2xl"></i>
+        </div>
+
+        <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+          <i class="fa-solid fa-user"></i>
+        </div>
+        <h3 class="font-bold text-lg text-slate-800">{{ profile?.hoTen || 'Đang tải...' }}</h3>
+        <p class="text-sm text-slate-500 mb-3">{{ profile?.soDienThoai || 'Chưa cập nhật SĐT' }}</p>
+        <div class="inline-block bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full text-sm font-medium border border-amber-200">
+          {{ getRankIcon(profile?.hangThanhVien) }} • {{ profile?.diemTichLuy || 0 }} điểm
+        </div>
+      </div>
+
+      <nav class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+        <a routerLink="/account/profile" routerLinkActive="bg-blue-50 text-blue-700 border-r-4 border-blue-600 font-semibold" class="flex items-center gap-3 px-6 py-4 text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer text-decoration-none">
+          <i class="fa-solid fa-user w-5 text-center"></i> Thông tin cá nhân
+        </a>
+        <a routerLink="/account/orders" routerLinkActive="bg-blue-50 text-blue-700 border-r-4 border-blue-600 font-semibold" class="flex items-center gap-3 px-6 py-4 text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer text-decoration-none border-t border-slate-50">
+          <i class="fa-solid fa-bag-shopping w-5 text-center"></i> Đơn hàng của tôi
+        </a>
+        <a routerLink="/account/addresses" routerLinkActive="bg-blue-50 text-blue-700 border-r-4 border-blue-600 font-semibold" class="flex items-center gap-3 px-6 py-4 text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer text-decoration-none border-t border-slate-50">
+          <i class="fa-solid fa-location-dot w-5 text-center"></i> Quản lý địa chỉ
+        </a>
+        <button (click)="logout()" class="flex items-center gap-3 px-6 py-4 text-red-600 hover:bg-red-50 transition-colors cursor-pointer text-left border-t border-slate-50">
+          <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Đăng xuất
+        </button>
+      </nav>
+    </aside>
+
+    <main class="flex-1 min-w-0">
+      <router-outlet></router-outlet>
+    </main>
+    
+  </div>
+</div>

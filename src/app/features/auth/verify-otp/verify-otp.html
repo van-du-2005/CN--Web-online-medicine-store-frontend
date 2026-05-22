@@ -1,0 +1,49 @@
+<div class="text-center mb-6">
+  <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-400 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg shadow-blue-500/30">
+    <i class="fa-solid fa-envelope-circle-check"></i>
+  </div>
+  <h2 class="text-2xl font-bold text-slate-800 mb-1">Xác thực email</h2>
+  <p class="text-sm text-slate-500">Nhập mã OTP đã được gửi đến email của bạn</p>
+</div>
+
+<div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-sm text-blue-700 flex items-center justify-center gap-2 mb-6">
+  <i class="fa-solid fa-paper-plane"></i>
+  <span>Mã xác thực đã gửi tới <strong>{{ email }}</strong></span>
+</div>
+
+<div *ngIf="errorMessage" class="bg-red-50 text-red-600 p-3 rounded-lg text-sm flex items-center justify-center gap-2 mb-4 animate-fade-in">
+  <i class="fa-solid fa-triangle-exclamation"></i>
+  <span class="font-medium">{{ errorMessage }}</span>
+</div>
+
+<form>
+  <div class="flex gap-2 sm:gap-3 justify-center mb-8">
+    <input *ngFor="let i of [0, 1, 2, 3, 4, 5]; let idx = index"
+           type="text" maxlength="1" inputmode="numeric" autocomplete="off"
+           [id]="'otp-' + idx"
+           (input)="onInput($event, idx)"
+           (keydown)="onKeyDown($event, idx)"
+           (paste)="onPaste($event)"
+           class="w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-bold rounded-lg border-2 outline-none transition-all duration-200 cursor-text"
+           [ngClass]="otpValues[idx] ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 bg-slate-50 text-slate-800 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10'" />
+  </div>
+
+  <button type="button" (click)="submitOtp()" [disabled]="isLoading" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 rounded-lg transition-all duration-200 active:scale-[0.98] cursor-pointer shadow-md flex justify-center items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none">
+    <i *ngIf="isLoading" class="fa-solid fa-spinner fa-spin"></i>
+    <i *ngIf="!isLoading" class="fa-solid fa-shield-halved"></i>
+    <span>{{ isLoading ? 'Đang xác thực...' : 'Xác nhận' }}</span>
+  </button>
+</form>
+
+<div class="text-center text-sm text-slate-500 mt-6">
+  Không nhận được mã?
+  <button type="button" (click)="resendOtp()" [disabled]="countdown > 0" class="font-semibold transition-colors focus:outline-none bg-transparent border-none p-0" [ngClass]="countdown > 0 ? 'text-slate-400 cursor-not-allowed' : 'text-blue-600 hover:text-blue-700 cursor-pointer'">
+    {{ countdown > 0 ? 'Gửi lại (' + countdown + 's)' : 'Gửi lại mã' }}
+  </button>
+</div>
+
+<p class="text-center mt-6">
+  <a routerLink="/auth/register" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 font-medium transition-colors cursor-pointer text-decoration-none">
+    <i class="fa-solid fa-arrow-left"></i> Quay lại đăng ký
+  </a>
+</p>

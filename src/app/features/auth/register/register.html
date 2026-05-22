@@ -1,0 +1,82 @@
+<div class="text-center mb-6">
+  <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+    <i class="fa-solid fa-user-plus"></i>
+  </div>
+  <h2 class="text-2xl font-bold text-slate-800 mb-1">Tạo tài khoản mới</h2>
+  <p class="text-sm text-slate-500">Đăng ký để nhận nhiều ưu đãi hấp dẫn</p>
+</div>
+
+<div class="flex border-b-2 border-slate-100 mb-6">
+  <a routerLink="/auth/login" class="flex-1 text-center py-3 text-slate-400 hover:text-slate-600 cursor-pointer transition-all border-b-2 border-transparent text-decoration-none">
+    <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
+  </a>
+  <a routerLink="/auth/register" class="flex-1 text-center py-3 border-b-2 border-emerald-600 text-emerald-600 font-semibold cursor-pointer transition-all text-decoration-none">
+    <i class="fa-solid fa-user-plus"></i> Đăng ký
+  </a>
+</div>
+
+<div *ngIf="errorMessage" class="bg-red-50 text-red-600 p-3 rounded-lg text-sm flex items-center gap-2 mb-4 animate-fade-in">
+  <i class="fa-solid fa-circle-exclamation"></i>
+  <span class="font-medium">{{ errorMessage }}</span>
+</div>
+
+<form class="space-y-4" (ngSubmit)="onSubmit()">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-1.5">Họ và tên <span class="text-red-500">*</span></label>
+      <div class="relative flex items-center">
+        <i class="fa-solid fa-id-card absolute left-4 text-slate-400"></i>
+        <input type="text" [(ngModel)]="formData.hoTen" name="hoTen" class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm" placeholder="Nguyen Van A" />
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tên đăng nhập <span class="text-red-500">*</span></label>
+      <div class="relative flex items-center">
+        <i class="fa-solid fa-user absolute left-4 text-slate-400"></i>
+        <input type="text" [(ngModel)]="formData.tenDangNhap" name="tenDangNhap" class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm" placeholder="nguyen_van_a" />
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-1.5">Số điện thoại <span class="text-red-500">*</span></label>
+      <div class="relative flex items-center">
+        <i class="fa-solid fa-phone absolute left-4 text-slate-400"></i>
+        <input type="tel" [(ngModel)]="formData.soDienThoai" name="soDienThoai" class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm" placeholder="0901 234 567" />
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email <span class="text-red-500">*</span></label>
+      <div class="relative flex items-center">
+        <i class="fa-solid fa-envelope absolute left-4 text-slate-400"></i>
+        <input type="email" [(ngModel)]="formData.email" name="email" class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm" placeholder="email@example.com" />
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Mật khẩu <span class="text-red-500">*</span></label>
+    <div class="relative flex items-center mb-2">
+      <i class="fa-solid fa-lock absolute left-4 text-slate-400"></i>
+      <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="formData.matKhau" name="matKhau" (input)="checkStrength($event)" class="w-full pl-11 pr-12 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm" placeholder="Ít nhất 6 ký tự" />
+      <button type="button" (click)="togglePassword()" class="absolute right-3 p-1.5 text-slate-400 hover:text-slate-600 cursor-pointer transition-colors border-none bg-transparent">
+        <i class="fa-regular" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+      </button>
+    </div>
+    <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+      <div class="h-full transition-all duration-300" [style.width.%]="strengthPct" [style.backgroundColor]="strengthColor"></div>
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="isLoading" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 mt-4 rounded-lg transition-all duration-200 active:scale-[0.98] cursor-pointer shadow-md shadow-emerald-500/20 flex justify-center items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none">
+    <i *ngIf="isLoading" class="fa-solid fa-spinner fa-spin"></i>
+    <i *ngIf="!isLoading" class="fa-solid fa-user-plus"></i>
+    <span>{{ isLoading ? 'Đang xử lý...' : 'Tạo tài khoản' }}</span>
+  </button>
+</form>
+
+<p class="text-center text-sm text-slate-600 mt-6">
+  Đã có tài khoản?
+  <a routerLink="/auth/login" class="text-emerald-600 font-semibold hover:underline cursor-pointer text-decoration-none">Đăng nhập ngay</a>
+</p>

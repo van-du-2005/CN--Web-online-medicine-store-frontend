@@ -1,0 +1,109 @@
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 relative min-h-[400px]">
+  <div *ngIf="isLoading" class="absolute inset-0 bg-white/80 rounded-xl flex items-center justify-center z-20">
+    <i class="fa-solid fa-spinner fa-spin text-blue-600 text-3xl"></i>
+  </div>
+
+  <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+    <i class="fa-solid fa-bag-shopping text-blue-600"></i> Đơn hàng của tôi
+  </h2>
+
+  <div class="flex overflow-x-auto border-b border-slate-200 mb-6 pb-px hide-scrollbar">
+    <button *ngFor="let tab of tabs" 
+            (click)="loadOrders(tab.value)"
+            [ngClass]="currentFilter === tab.value ? 'border-blue-600 text-blue-600 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'"
+            class="whitespace-nowrap py-3 px-4 border-b-2 transition-colors cursor-pointer outline-none">
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <div *ngIf="!isLoading && orders.length === 0" class="text-center py-12">
+    <div class="text-5xl mb-4">🛍️</div>
+    <h3 class="text-lg font-bold text-slate-800 mb-2">Chưa có đơn hàng nào</h3>
+    <p class="text-slate-500 mb-6">Hãy mua sắm để xem lịch sử đơn hàng tại đây</p>
+    <a routerLink="/" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg transition-colors cursor-pointer text-decoration-none shadow-sm">
+      <i class="fa-solid fa-cart-shopping"></i> Mua sắm ngay
+    </a>
+  </div>
+
+  <div *ngIf="!isLoading && orders.length > 0" class="space-y-4">
+    <div *ngFor="let order of orders" class="border border-slate-200 rounded-xl overflow-hidden animate-fade-in">
+      
+      <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+        <div class="text-sm">
+          <span class="text-slate-500 mr-2"><i class="fa-regular fa-calendar"></i> {{ order.ngayDat | date:'dd/MM/yyyy' }}</span>
+          <span class="font-semibold text-slate-800">#{{ getShortId(order.maDonHang) }}</span>
+        </div>
+        <span class="px-2.5 py-1 rounded-full text-xs font-semibold" [ngClass]="getStatusClass(order.trangThai)">
+          {{ getStatusLabel(order.trangThai) }}
+        </span>
+      </div>
+
+      <div class="p-5">
+        <div *ngIf="order.chiTiet.length > 0" class="flex gap-4 items-center">
+          <div class="w-16 h-16 rounded-lg border border-slate-200 flex-shrink-0 overflow-hidden flex items-center justify-center bg-slate-50 text-2xl">
+            <img *ngIf="order.chiTiet[0].hinhAnh" [src]="order.chiTiet[0].hinhAnh" class="w-full h-full object-cover" />
+            <span *ngIf="!order.chiTiet[0].hinhAnh">💊</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-slate-800 truncate">{{ order.chiTiet[0].tenThuoc }}</div>
+            <div class="text-sm text-slate-500 mt-1">
+              {{ order.chiTiet[0].donGia | number:'1.0-0' }}đ × {{ order.chiTiet[0].soLuong }}
+            </div>
+          </div>
+        </div>
+        
+        <button *ngIf="order.chiTiet.length > 1" (click)="openModal(order)" class="text-sm text-blue-600 hover:text-blue-700 font-medium mt-3 text-left w-full cursor-pointer transition-colors outline-none bg-transparent border-none p-0">
+          + {{ order.chiTiet.length - 1 }} sản phẩm khác
+        </button>
+      </div>
+
+      <div class="px-5 py-4 border-t border-slate-100 flex flex-wrap justify-between items-center gap-4">
+        <div class="text-slate-600">
+          Thành tiền: <strong class="text-blue-600 text-lg">{{ order.thanhToan | number:'1.0-0' }}đ</strong>
+        </div>
+        <div class="flex gap-2">
+          <button (click)="openModal(order)" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium text-sm transition-colors cursor-pointer">
+            Xem chi tiết
+          </button>
+          
+          <button *ngIf="order.trangThai === 'ChoXacNhan'" 
+                  [disabled]="isActionLoading"
+                  (click)="cancelOrder(order.maDonHang)" 
+                  class="px-4 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 font-medium text-sm transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+            Hủy đơn
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showModal" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4 animate-fade-in" (click)="closeModal()">
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden" (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center p-4 border-b border-slate-100">
+      <h3 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-receipt text-blue-600 mr-2"></i> Chi tiết đơn hàng</h3>
+      <button (click)="closeModal()" class="text-slate-400 hover:text-slate-600 text-2xl cursor-pointer bg-transparent border-none">&times;</button>
+    </div>
+    
+    <div class="p-4 overflow-y-auto" *ngIf="selectedOrder">
+      <div *ngFor="let item of selectedOrder.chiTiet" class="flex gap-3 py-3 border-b border-slate-100">
+        <div class="w-12 h-12 rounded border border-slate-200 flex-shrink-0 flex items-center justify-center bg-slate-50">
+          <img *ngIf="item.hinhAnh" [src]="item.hinhAnh" class="w-full h-full object-cover rounded" />
+          <span *ngIf="!item.hinhAnh">💊</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-medium text-slate-800 truncate text-sm">{{ item.tenThuoc }}</div>
+          <div class="text-xs text-slate-500 mt-1">{{ item.donGia | number:'1.0-0' }}đ × {{ item.soLuong }}</div>
+        </div>
+        <div class="font-semibold text-slate-800 text-sm whitespace-nowrap">
+          {{ (item.donGia * item.soLuong) | number:'1.0-0' }}đ
+        </div>
+      </div>
+      
+      <div class="mt-4 flex justify-between font-bold text-lg text-slate-800">
+        <span>Tổng thanh toán</span>
+        <span class="text-blue-600">{{ selectedOrder.thanhToan | number:'1.0-0' }}đ</span>
+      </div>
+    </div>
+  </div>
+</div>
