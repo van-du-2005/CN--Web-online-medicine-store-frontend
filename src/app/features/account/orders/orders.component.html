@@ -31,7 +31,7 @@
       <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
         <div class="text-sm">
           <span class="text-slate-500 mr-2"><i class="fa-regular fa-calendar"></i> {{ order.ngayDat | date:'dd/MM/yyyy' }}</span>
-          <span class="font-semibold text-slate-800">#{{ getShortId(order.maDonHang) }}</span>
+          <span class="font-semibold text-slate-800">#{{ getFullId(order.maDonHang) }}</span>
         </div>
         <span class="px-2.5 py-1 rounded-full text-xs font-semibold" [ngClass]="getStatusClass(order.trangThai)">
           {{ getStatusLabel(order.trangThai) }}
@@ -100,9 +100,26 @@
         </div>
       </div>
       
-      <div class="mt-4 flex justify-between font-bold text-lg text-slate-800">
-        <span>Tổng thanh toán</span>
-        <span class="text-blue-600">{{ selectedOrder.thanhToan | number:'1.0-0' }}đ</span>
+      <div class="mt-4 pt-4 space-y-2">
+        <div class="flex justify-between text-slate-600 text-sm">
+          <span>Tạm tính</span>
+          <span >{{ selectedOrder.tamTinh | number:'1.0-0' }}đ</span>
+        </div>
+        
+        <div class="flex justify-between text-slate-600 text-sm">
+          <span>Phí vận chuyển</span>
+          <span>{{ selectedOrder.phiVanChuyen | number:'1.0-0' }}đ</span>
+        </div>
+        
+        <div *ngIf="selectedOrder.giamGia > 0" class="flex justify-between text-emerald-600 text-sm">
+          <span>Giảm giá</span>
+          <span>-{{ selectedOrder.giamGia | number:'1.0-0' }}đ</span>
+        </div>
+        
+        <div class="flex justify-between font-bold text-lg text-slate-800 pt-3 border-t border-slate-100 mt-3">
+          <span>Tổng thanh toán</span>
+          <span class="text-blue-600">{{ selectedOrder.thanhToan | number:'1.0-0' }}đ</span>
+        </div>
       </div>
     </div>
   </div>
