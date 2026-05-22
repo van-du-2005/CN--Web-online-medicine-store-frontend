@@ -23,8 +23,7 @@ export class CheckoutComponent implements OnInit {
         { id: 'p2', name: 'Phường Tân Định (Quận 1)' },
         { id: 'p3', name: 'Phường Bến Thành (Quận 1)' },
         { id: 'p4', name: 'Phường Cầu Ông Lãnh (Quận 1)' },
-        // Quận 3
-        // Quận 5 (xưa)
+        // Quận 5
         { id: 'p11', name: 'Phường Chợ Quán (Quận 5)' },
         { id: 'p12', name: 'Phường An Đông (Quận 5)' },
         { id: 'p13', name: 'Phường Chợ Lớn (Quận 5)' }
@@ -58,24 +57,20 @@ export class CheckoutComponent implements OnInit {
 
     // Hàm load dữ liệu từ giỏ hàng Backend để chuẩn bị submit
     loadCartData(): void {
-        // LƯU Ý: Bạn cần đảm bảo checkoutService hoặc một CartService bên Angular 
-        // có hàm gọi đến API giỏ hàng của Backend (nơi xử lý file CartService C# bạn gửi).
-        // Dưới đây là logic giả định bạn lấy dữ liệu thành công từ endpoint đó:
-        
         this.checkoutService.getCartFromBackend().subscribe({
-            next: (data: any) => {
-                if (data && data.items) {
+            next: (response) => {
+                if (response && response.success && response.data && response.data.items) {
                     // Map dữ liệu từ CartItemDto (Backend) sang OrderItemInterface (Frontend)
-                    this.cartItems = data.items.map((item: any) => ({
-                        maSanPham: item.maThuoc,
-                        tenSanPham: item.tenThuoc,
+                    this.cartItems = response.data.items.map((item: any) => ({
+                        maThuoc: item.maThuoc,     // ← Đổi từ maSanPham
+                        tenThuoc: item.tenThuoc,   // ← Đổi từ tenSanPham
                         soLuong: item.soLuong,
-                        giaBan: item.gia,
-                        hinhAnh: item.hinhAnh
-                    }));
+                        donGia: item.gia,          // ← Đổi từ giaBan (cart trả về "gia")
+                        tongTien: item.gia * item.soLuong
+                        }));
 
                     // Tự động tính tổng tiền từ danh sách sản phẩm test
-                    this.totalAmount = this.cartItems.reduce((sum, item) => sum + (item.giaBan * item.soLuong), 0);
+                    this.totalAmount = this.cartItems.reduce((sum, item) => sum + (item.donGia * item.soLuong), 0);
                 }
             },
             error: (err) => {
@@ -88,49 +83,68 @@ export class CheckoutComponent implements OnInit {
         this.checkoutForm.get('paymentMethod')?.setValue(method);
     }
 
+    
     onSubmit(): void {
-        if (this.checkoutForm.valid) {
-            // Kiểm tra xem giỏ hàng từ Backend đã kịp load lên chưa
-            if (this.cartItems.length === 0) {
-                alert('Giỏ hàng trống hoặc chưa tải xong dữ liệu từ Server!');
-                return;
-            }
+    if (this.checkoutForm.valid) {
+        const formValues = this.checkoutForm.value;
 
-            const formValues = this.checkoutForm.value;
-
-            // Đóng gói toàn bộ thông tin chuẩn theo cấu trúc CheckoutInterface
-            const checkoutData: CheckoutInterface = {
-                maKhachHang: '', // Cứ để trống, Backend sẽ tự đọc từ JWT Token [Authorize]
-                tenNguoiMua: formValues.buyerName,
-                soDienThoai: formValues.phoneNumber,
-                tinh: formValues.province,
-                phuong: formValues.ward,
-                diaChiCuThe: formValues.specificAddress,
-                phuongThucThanhToan: formValues.paymentMethod,
-                tongTienThanhToan: this.totalAmount, // Gắn tổng tiền thực tế
-                sanPhamDaMua: this.cartItems         // Gắn danh sách thuốc thực tế từ Backend
-            };
-
-            // KÍCH HOẠT TIẾN TRÌNH GỌI API ĐẾN BACKEND CONTROLLER
-            this.checkoutService.processCheckout(checkoutData).subscribe({
-                next: (response) => {
-                    if (response.success) {
-                        if (response.paymentUrl) {
-                            // Nếu chọn ZaloPay thành công -> Điều hướng trình duyệt sang cổng thanh toán
-                            window.location.href = response.paymentUrl;
-                        } else {
-                            // Nếu chọn COD thành công
-                            alert(response.message || 'Đặt hàng thành công!');
-                        }
-                    } else {
-                        alert('Xử lý thất bại: ' + response.message);
-                    }
-                },
-                error: (err) => {
-                    console.error('Lỗi kết nối API Checkout:', err);
-                    alert('Đã xảy ra lỗi hệ thống khi kết nối đến Controller Backend.');
-                }
-            });
+        // KIỂM TRA: Đảm bảo giỏ hàng đã được load từ Backend về thành công trước đó
+        if (!this.cartItems || this.cartItems.length === 0) {
+            alert('Giỏ hàng thanh toán không được để trống.');
+            return;
         }
+
+        /**
+         * ĐÓNG GÓI DỮ LIỆU CHUẨN 100% THEO CHECKOUTDTO PHÍA BACKEND
+         * Lưu ý: Các chữ cái đầu tiên viết thường (camelCase) vì .NET Core tự động 
+         * chuyển đổi PascalCase sang camelCase khi tiếp nhận JSON từ Frontend.
+         */
+        const checkoutData = {
+            tenNguoiMua: formValues.buyerName,
+            soDienThoai: formValues.phoneNumber,
+            tinh: formValues.province,
+            phuong: formValues.ward,
+            diaChiCuThe: formValues.specificAddress,
+            tongTienThanhToan: this.totalAmount,
+            phuongThucThanhToan: formValues.paymentMethod,
+            
+            // Danh sách sản phẩm phải khớp với cấu trúc của OrderItemDTO bên Backend
+            sanPhamDaMua: this.cartItems.map(item => ({
+            maThuoc: item.maThuoc,       // ← maSanPham → maThuoc
+            tenThuoc: item.tenThuoc,     // ← tenSanPham → tenThuoc
+            soLuong: Number(item.soLuong),
+            donGia: Number(item.donGia),   // ← giaBan → donGia
+            tongTien: Number(item.donGia) * Number(item.soLuong) // ← Thêm tongTien
+            }))
+        };
+
+        console.log('Dữ liệu chuẩn bị gửi sang Backend:', checkoutData);
+
+        // GỬI REQUEST SANG CONTROLLER BACKEND
+        this.checkoutService.processCheckout(checkoutData).subscribe({
+            next: (response) => {
+                if (response.success) {
+                    if (response.paymentUrl) {
+                        // Nếu là ZaloPay -> Điều hướng qua cổng thanh toán
+                        window.location.href = response.paymentUrl;
+                    } else {
+                        // Nếu là COD -> Thông báo thành công
+                        alert(response.message || 'Đặt hàng thành công với hình thức COD!');
+                    }
+                } else {
+                    alert('Thanh toán thất bại: ' + response.message);
+                }
+            },
+            error: (err) => {
+                console.error('Lỗi kết nối API Checkout:', err);
+                
+                // Hiển thị chi tiết lỗi cụ thể từ .NET trả về nếu có lệch kiểu dữ liệu
+                if (err.error && err.error.errors) {
+                    console.log('Chi tiết lỗi từ Backend:', err.error.errors);
+                }
+                alert('Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng kiểm tra lại thông tin nhập vào!');
+            }
+        });
     }
+}
 }

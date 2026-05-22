@@ -1,13 +1,13 @@
 export interface OrderItemInterface {
-    maSanPham: string;
-    tenSanPham: string;
-    soLuong: number;
-    giaBan: number;   
-    hinhAnh?: string;
+  maThuoc: string;
+  tenThuoc: string;
+  soLuong: number;
+  donGia: number;
+  tongTien: number;
 }
 
 export interface CheckoutInterface {
-    maKhachHang: string;
+    maKhachHang?: string;
     tenNguoiMua: string;
     soDienThoai: string;
     tinh: string;

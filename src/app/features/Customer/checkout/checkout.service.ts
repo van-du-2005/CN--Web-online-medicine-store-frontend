@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CheckoutInterface } from './checkout.model';
 import { StorageService } from '../../../services/storage.service';
+import { CartDto } from '../cart/cart.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,6 @@ export class CheckoutService {
   private storageService = inject(StorageService);
   
   private apiUrl = 'http://localhost:5237/api/checkout'; 
-  // Bạn cấu hình thêm URL trỏ đến CartController ở Backend (nếu có) để lấy dữ liệu test
   private cartApiUrl = 'http://localhost:5237/api/cart'; 
 
   private getAuthHeaders(): HttpHeaders {
@@ -24,8 +24,8 @@ export class CheckoutService {
   }
 
   // HÀM BỔ SUNG: Gọi sang API Backend để lấy dữ liệu từ file CartService (C#)
-  getCartFromBackend(): Observable<any> {
-    return this.http.get<any>(this.cartApiUrl, {
+  getCartFromBackend(): Observable<{ success: boolean, data: CartDto }> {
+    return this.http.get<{ success: boolean, data: CartDto }>(this.cartApiUrl, {
       headers: this.getAuthHeaders(),
       withCredentials: true
     });

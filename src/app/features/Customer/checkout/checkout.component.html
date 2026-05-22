@@ -73,9 +73,20 @@
         <div class="flex gap-3">
           <button 
             type="button" 
+            (click)="selectPayment('cod')"
+            [class.border-[#3178e5]]="checkoutForm.get('paymentMethod')?.value === 'cod'"
+            class="w-14 h-14 p-1 rounded-full border border-gray-200 bg-white flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
+            title="COD - Tiền mặt"
+          >
+            <img src="images/logo/cod.png" alt="COD" class="w-full h-full object-contain rounded-full" />
+          </button>
+
+          <button 
+            type="button" 
             (click)="selectPayment('zalopay')"
             [class.border-[#3178e5]]="checkoutForm.get('paymentMethod')?.value === 'zalopay'"
             class="w-14 h-14 p-1 rounded-full border border-gray-200 bg-white flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
+            title="ZaloPay"
           >
             <img src="images/logo/zalopay.png" alt="ZaloPay" class="w-full h-full object-contain rounded-full" />
           </button>
@@ -85,6 +96,7 @@
             (click)="selectPayment('vnpay')"
             [class.border-[#3178e5]]="checkoutForm.get('paymentMethod')?.value === 'vnpay'"
             class="w-14 h-14 p-1 rounded-full border border-gray-200 bg-white flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
+            title="VNPAY"
           >
             <img src="images/logo/vnpay.jpg" alt="VNPAY" class="w-full h-full object-contain rounded-full" />
           </button>
