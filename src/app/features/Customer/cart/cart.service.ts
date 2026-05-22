@@ -9,8 +9,7 @@ import { CartDto } from './cart.model';
 })
 export class CartService {
   private http = inject(HttpClient);
-  // Đổi port theo đúng Backend đang chạy của bạn
-  private apiUrl = 'http://localhost:5237/api/Cart'; 
+  private apiUrl = 'http://localhost:5237/api/cart'; 
 
   getCart(): Observable<{ success: boolean, data: CartDto }> {
     return this.http.get<any>(this.apiUrl);

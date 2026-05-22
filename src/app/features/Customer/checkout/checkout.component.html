@@ -1,0 +1,108 @@
+<div class="min-h-screen bg-[#e0f0ff] flex items-center justify-center p-4">
+  <div class="w-full max-w-160 bg-white rounded-3xl border border-gray-200 shadow-sm p-8 sm:p-12">
+    
+    <h1 class="text-3xl font-bold text-[#3178e5] text-center mb-8">Thanh toán</h1>
+
+    <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      
+      <div>
+        <h2 class="text-sm font-bold text-gray-800 mb-3">Thông tin người nhận</h2>
+        <div class="space-y-4">
+          <input 
+            type="text" 
+            formControlName="buyerName"
+            placeholder="Tên người mua" 
+            class="w-full px-5 py-3.5 bg-white border border-gray-300 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#3178e5] transition-colors"
+          />
+          <input 
+            type="tel" 
+            formControlName="phoneNumber"
+            placeholder="Số điện thoại" 
+            class="w-full px-5 py-3.5 bg-white border border-gray-300 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#3178e5] transition-colors"
+          />
+        </div>
+      </div>
+
+      <hr class="border-gray-200 my-4" />
+
+      <div>
+        <h2 class="text-sm font-bold text-gray-800 mb-3">Địa chỉ nhận hàng</h2>
+        <div class="space-y-4">
+          
+          <div class="relative">
+            <select 
+              formControlName="province"
+              class="w-full px-5 py-3.5 bg-white border border-gray-300 rounded-xl text-gray-500 appearance-none focus:outline-none focus:border-[#3178e5] transition-colors"
+            >
+              <option value="" disabled selected hidden>Chọn tỉnh/ thành phố</option>
+              <option *ngFor="let p of provinces" [value]="p.id">{{ p.name }}</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-gray-400">
+              <svg class="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="relative">
+            <select 
+              formControlName="ward"
+              class="w-full px-5 py-3.5 bg-white border border-gray-300 rounded-xl text-gray-500 appearance-none focus:outline-none focus:border-[#3178e5] transition-colors"
+            >
+              <option value="" disabled selected hidden>Chọn phường/ xã</option>
+              <option *ngFor="let w of wards" [value]="w.id">{{ w.name }}</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-gray-400">
+              <svg class="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+              </svg>
+            </div>
+          </div>
+
+          <input 
+            type="text" 
+            formControlName="specificAddress"
+            placeholder="Nhập địa chỉ cụ thể" 
+            class="w-full px-5 py-3.5 bg-white border border-gray-300 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#3178e5] transition-colors"
+          />
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 py-2">
+        <span class="text-sm font-bold text-gray-800">Thanh toán bằng</span>
+        <div class="flex gap-3">
+          <button 
+            type="button" 
+            (click)="selectPayment('zalopay')"
+            [class.border-[#3178e5]]="checkoutForm.get('paymentMethod')?.value === 'zalopay'"
+            class="w-14 h-14 p-1 rounded-full border border-gray-200 bg-white flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
+          >
+            <img src="images/logo/zalopay.png" alt="ZaloPay" class="w-full h-full object-contain rounded-full" />
+          </button>
+
+          <button 
+            type="button" 
+            (click)="selectPayment('vnpay')"
+            [class.border-[#3178e5]]="checkoutForm.get('paymentMethod')?.value === 'vnpay'"
+            class="w-14 h-14 p-1 rounded-full border border-gray-200 bg-white flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
+          >
+            <img src="images/logo/vnpay.jpg" alt="VNPAY" class="w-full h-full object-contain rounded-full" />
+          </button>
+        </div>
+      </div>
+
+      <hr class="border-gray-200 my-4" />
+
+      <div class="pt-2 flex justify-center">
+        <button 
+          type="submit" 
+          [disabled]="checkoutForm.invalid"
+          class="w-full max-w-[320px] py-4 bg-[#3178e5] text-white font-semibold text-lg rounded-full shadow-md hover:bg-[#2762bd] active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none"
+        >
+          Thanh toán
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
