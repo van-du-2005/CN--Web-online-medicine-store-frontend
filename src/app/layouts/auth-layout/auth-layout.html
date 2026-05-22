@@ -1,0 +1,19 @@
+<div class="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+  <header class="mb-8 text-center">
+    <a routerLink="/" class="flex items-center justify-center gap-3 group cursor-pointer text-decoration-none">
+      <div class="text-5xl text-blue-600 transition-transform duration-300 group-hover:scale-110">
+        <i class="fa-solid fa-pills"></i>
+      </div>
+      <div class="text-left text-slate-800">
+        <h1 class="font-bold text-2xl leading-tight group-hover:text-blue-600 transition-colors">Nhà Thuốc Sống Khỏe</h1>
+        <span class="text-sm text-slate-500 font-medium">Chăm sóc sức khỏe toàn diện</span>
+      </div>
+    </a>
+  </header>
+
+  <main class="w-full max-w-[450px]">
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden p-6 sm:p-8">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
