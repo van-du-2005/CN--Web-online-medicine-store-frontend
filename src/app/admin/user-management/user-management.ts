@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UserService, User } from '../../services/user.service'; // Import Service
 
 @Component({
   selector: 'app-user-management',
@@ -19,7 +20,13 @@ import { FormsModule } from '@angular/forms';
     .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
   `]
 })
-export class UserManagementComponent {
+export class UserManagementComponent implements OnInit {
+  // Nhúng UserService vào
+  private userService = inject(UserService);
+
+  // Mảng rỗng sẽ được lấp đầy bằng dữ liệu từ Database
+  danhSachUser: User[] = [];
+
   // --- TÌM KIẾM & PHÂN TRANG ---
   tuKhoaTimKiem = '';
   trangHienTai = 1;
@@ -29,42 +36,92 @@ export class UserManagementComponent {
   hienThiForm = false;
   isEditMode = false;
   hienThiChiTiet = false;
-  selectedUser: any = null;
+  selectedUser: User | null = null;
   hienThiXacNhanXoa = false;
-  userToDelete: any = null;
+  userToDelete: User | null = null;
 
   formData: any = { hoTen: '', email: '', sdt: '', vaiTro: 'Chọn vai trò', matKhau: '' };
 
-  // Dữ liệu mẫu (Đã tăng lên 12 người để test phân trang)
-  danhSachUser = [
-    { id: '1', hoTen: 'Nguyễn Văn A', avatar: 'https://placehold.co/150x150?text=A', email: 'a@gmail.com', sdt: '0912 345 678', vaiTro: 'Admin', trangThai: true },
-    { id: '2', hoTen: 'Trần Thị B', avatar: 'https://placehold.co/150x150?text=B', email: 'b@gmail.com', sdt: '0987 654 321', vaiTro: 'Dược sĩ', trangThai: true },
-    { id: '3', hoTen: 'Lê Văn C', avatar: 'https://placehold.co/150x150?text=C', email: 'c@gmail.com', sdt: '0909 123 456', vaiTro: 'Thu ngân', trangThai: true },
-    { id: '4', hoTen: 'Phạm Văn D', avatar: 'https://placehold.co/150x150?text=D', email: 'd@gmail.com', sdt: '0934 567 890', vaiTro: 'Nhân viên kho', trangThai: true },
-    { id: '5', hoTen: 'Nguyễn Văn E', avatar: 'https://placehold.co/150x150?text=E', email: 'e@gmail.com', sdt: '0922 223 333', vaiTro: 'Khách hàng', trangThai: true },
-    { id: '6', hoTen: 'Hoàng Thị F', avatar: 'https://placehold.co/150x150?text=F', email: 'hoangf@gmail.com', sdt: '0911 111 222', vaiTro: 'Khách hàng', trangThai: true },
-    { id: '7', hoTen: 'Đinh Văn G', avatar: 'https://placehold.co/150x150?text=G', email: 'dinhg@gmail.com', sdt: '0922 333 444', vaiTro: 'Dược sĩ', trangThai: false },
-    { id: '8', hoTen: 'Vũ Thị H', avatar: 'https://placehold.co/150x150?text=H', email: 'vuh@gmail.com', sdt: '0933 444 555', vaiTro: 'Thu ngân', trangThai: true },
-    { id: '9', hoTen: 'Bùi Văn I', avatar: 'https://placehold.co/150x150?text=I', email: 'buii@gmail.com', sdt: '0944 555 666', vaiTro: 'Nhân viên kho', trangThai: true },
-    { id: '10', hoTen: 'Lý Thị K', avatar: 'https://placehold.co/150x150?text=K', email: 'lyk@gmail.com', sdt: '0955 666 777', vaiTro: 'Khách hàng', trangThai: true },
-    { id: '11', hoTen: 'Trịnh Văn L', avatar: 'https://placehold.co/150x150?text=L', email: 'trinhl@gmail.com', sdt: '0966 777 888', vaiTro: 'Dược sĩ', trangThai: true },
-    { id: '12', hoTen: 'Ngô Thị M', avatar: 'https://placehold.co/150x150?text=M', email: 'ngom@gmail.com', sdt: '0977 888 999', vaiTro: 'Khách hàng', trangThai: true }
-  ];
+  // Hàm chạy ngay khi vừa vào trang Admin
+  ngOnInit() {
+    this.loadUsers();
+  }
 
-  // --- LOGIC TÌM KIẾM & PHÂN TRANG ---
+  // ==========================================
+  // LOGIC GỌI API BACKEND
+  // ==========================================
 
-  // 1. Lọc dữ liệu theo từ khóa tìm kiếm
+  // Lấy danh sách người dùng
+  loadUsers() {
+    this.userService.getUsers().subscribe({
+      next: (data) => {
+        this.danhSachUser = data;
+      },
+      error: (err) => console.error('Lỗi khi tải dữ liệu người dùng:', err)
+    });
+  }
+
+  // Thêm hoặc Cập nhật tài khoản
+  luuTaiKhoan() {
+    if (this.isEditMode && this.formData.id) {
+      this.userService.updateUser(this.formData.id, this.formData).subscribe({
+        next: () => {
+          this.loadUsers(); // Cập nhật xong thì tải lại bảng
+          this.dongForm();
+        },
+        error: (err) => alert('Có lỗi khi cập nhật tài khoản!')
+      });
+    } else {
+      this.userService.addUser(this.formData).subscribe({
+        next: () => {
+          this.loadUsers(); // Thêm xong thì tải lại bảng
+          this.dongForm();
+        },
+        error: (err) => alert('Có lỗi khi thêm tài khoản mới!')
+      });
+    }
+  }
+
+  // Khóa / Mở khóa tài khoản
+  toggleTrangThai(user: User, event: Event) {
+    event.stopPropagation();
+    this.userService.toggleStatus(user.id).subscribe({
+      next: () => this.loadUsers(),
+      error: (err) => alert('Lỗi khi thay đổi trạng thái!')
+    });
+  }
+
+  // Xóa tài khoản
+  xoaNguoiDung() {
+    if (this.userToDelete) {
+      this.userService.deleteUser(this.userToDelete.id).subscribe({
+        next: () => {
+          this.loadUsers();
+          this.hienThiXacNhanXoa = false;
+          this.userToDelete = null;
+          // Lùi về trang trước nếu lỡ xóa hết người ở trang cuối
+          if (this.trangHienTai > this.tongSoTrang) this.trangHienTai = this.tongSoTrang || 1;
+        },
+        error: (err) => alert('Lỗi khi xóa người dùng!')
+      });
+    }
+  }
+
+
+  // ==========================================
+  // LOGIC TÌM KIẾM & PHÂN TRANG (GIỮ NGUYÊN)
+  // ==========================================
+
   get danhSachDaLoc() {
     if (!this.tuKhoaTimKiem.trim()) return this.danhSachUser;
     const tuKhoa = this.tuKhoaTimKiem.toLowerCase().trim();
     return this.danhSachUser.filter(u =>
-      u.hoTen.toLowerCase().includes(tuKhoa) ||
-      u.email.toLowerCase().includes(tuKhoa) ||
-      u.sdt.includes(tuKhoa)
+      (u.hoTen && u.hoTen.toLowerCase().includes(tuKhoa)) ||
+      (u.email && u.email.toLowerCase().includes(tuKhoa)) ||
+      (u.sdt && u.sdt.includes(tuKhoa))
     );
   }
 
-  // 2. Cắt danh sách để hiển thị trên 1 trang (5 người)
   get danhSachHienThi() {
     const batDau = (this.trangHienTai - 1) * this.soNguoiTrenTrang;
     return this.danhSachDaLoc.slice(batDau, batDau + this.soNguoiTrenTrang);
@@ -86,16 +143,14 @@ export class UserManagementComponent {
     return `Hiển thị ${batDau} - ${ketThuc} của ${max} người dùng`;
   }
 
-  onSearch() {
-    this.trangHienTai = 1; // Reset về trang 1 khi gõ tìm kiếm
-  }
-
+  onSearch() { this.trangHienTai = 1; }
   chuyenTrang(page: number) { this.trangHienTai = page; }
   trangTruoc() { if (this.trangHienTai > 1) this.trangHienTai--; }
   trangTiep() { if (this.trangHienTai < this.tongSoTrang) this.trangHienTai++; }
 
-
-  // --- LOGIC POPUP & DỮ LIỆU CŨ KẾ THỪA ---
+  // ==========================================
+  // LOGIC GIAO DIỆN POPUP VÀ MÀU SẮC (GIỮ NGUYÊN)
+  // ==========================================
 
   moFormThem() {
     this.isEditMode = false;
@@ -103,7 +158,7 @@ export class UserManagementComponent {
     this.hienThiForm = true;
   }
 
-  moFormSua(user: any, event: Event) {
+  moFormSua(user: User, event: Event) {
     event.stopPropagation();
     this.isEditMode = true;
     this.formData = { ...user };
@@ -112,50 +167,14 @@ export class UserManagementComponent {
 
   dongForm() { this.hienThiForm = false; }
 
-  luuTaiKhoan() {
-    if (this.isEditMode) {
-      const index = this.danhSachUser.findIndex(u => u.id === this.formData.id);
-      if (index > -1) this.danhSachUser[index] = { ...this.formData };
-    } else {
-      const newUser = {
-        ...this.formData,
-        id: (this.danhSachUser.length + 1).toString(),
-        avatar: 'https://placehold.co/150x150?text=' + this.formData.hoTen.charAt(0).toUpperCase(),
-        trangThai: true
-      };
-      this.danhSachUser.unshift(newUser);
-    }
-    this.dongForm();
-  }
-
-  toggleTrangThai(user: any, event: Event) {
-    event.stopPropagation();
-    user.trangThai = !user.trangThai;
-  }
-
-  xacNhanXoa(user: any, event: Event) {
+  xacNhanXoa(user: User, event: Event) {
     event.stopPropagation();
     this.userToDelete = user;
     this.hienThiXacNhanXoa = true;
   }
 
-  xoaNguoiDung() {
-    if (this.userToDelete) {
-      this.danhSachUser = this.danhSachUser.filter(u => u.id !== this.userToDelete.id);
-      this.hienThiXacNhanXoa = false;
-      this.userToDelete = null;
-      // Quay về trang trước nếu xóa hết user ở trang cuối
-      if (this.trangHienTai > this.tongSoTrang) this.trangHienTai = this.tongSoTrang || 1;
-    }
-  }
-
   huyXoa() { this.hienThiXacNhanXoa = false; }
-
-  xemChiTiet(user: any) {
-    this.selectedUser = user;
-    this.hienThiChiTiet = true;
-  }
-
+  xemChiTiet(user: User) { this.selectedUser = user; this.hienThiChiTiet = true; }
   dongChiTiet() { this.hienThiChiTiet = false; }
 
   getRoleColor(role: string): string {
