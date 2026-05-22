@@ -12,6 +12,8 @@ import { AccountLayoutComponent } from './features/account/layout/account-layout
 import { ProfileComponent } from './features/account/profile/profile.component';
 import { OrdersComponent } from './features/account/orders/orders.component';
 import { AddressesComponent } from './features/account/addresses/addresses.component';
+import { AdminLayoutComponent } from '../app/layouts/admin/admin-layout.component';
+import { DashboardComponent } from './features/admin/dashboard/dashboard.component';
 
 export const routes: Routes = [
   {
@@ -39,7 +41,14 @@ export const routes: Routes = [
     ]
   },
   
-  { path: 'profile', redirectTo: 'account/profile', pathMatch: 'full' },
+  {
+    path: 'admin',
+    component: AdminLayoutComponent,
+    children: [
+      { path: 'dashboard', component: DashboardComponent },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+    ]
+  },
 
   { 
     // Tạm thời điều hướng trang chủ (localhost:4200) thẳng vào trang đăng nhập để dễ test
