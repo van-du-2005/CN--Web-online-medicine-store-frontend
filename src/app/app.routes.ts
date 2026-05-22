@@ -1,8 +1,3 @@
-//  import { Routes } from '@angular/router';
-
-
-// export const routes: Routes = [];
-
 import { Routes } from '@angular/router';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { LoginComponent } from './features/auth/login/login';
@@ -13,6 +8,7 @@ import { ProfileComponent } from './features/account/profile/profile.component';
 import { OrdersComponent } from './features/account/orders/orders.component';
 import { AddressesComponent } from './features/account/addresses/addresses.component';
 import { CartComponent } from './features/Customer/cart/cart.component';
+import { CheckoutComponent } from './features/Customer/checkout/checkout.component';
 
 export const routes: Routes = [
   {
@@ -43,6 +39,10 @@ export const routes: Routes = [
   {
     path: 'cart',
     component: CartComponent
+  },
+  {
+    path: 'checkout',
+    component: CheckoutComponent
   },
   
   { path: 'profile', redirectTo: 'account/profile', pathMatch: 'full' },

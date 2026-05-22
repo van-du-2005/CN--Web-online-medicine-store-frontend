@@ -9,7 +9,7 @@ export class StorageService {
   setToken(token: string, days: number = 7): void {
     const expires = new Date(Date.now() + days * 864e5).toUTCString();
     // Yêu cầu HTTPS (Secure) và chống gửi Cookie chéo trang (SameSite=Strict)
-    document.cookie = `${this.TOKEN_KEY}=${encodeURIComponent(token)}; expires=${expires}; path=/; Secure; SameSite=Strict`;
+    document.cookie = `${this.TOKEN_KEY}=${encodeURIComponent(token)}; expires=${expires}; path=/;SameSite=Strict`;
   }
 
   getToken(): string | null {
