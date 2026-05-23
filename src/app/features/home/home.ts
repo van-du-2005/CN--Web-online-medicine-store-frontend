@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ThuocService, Thuoc } from '../../services/thuoc';
@@ -9,10 +9,17 @@ import { ThuocService, Thuoc } from '../../services/thuoc';
   imports: [CommonModule, RouterLink],
   templateUrl: './home.html'
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   danhSachThuoc: Thuoc[] = [];
   isLoading = true; // 1. Thêm biến cờ hiệu chờ tải dữ liệu
   activeTab = 0;
+
+  // Countdown timer
+  countdownDays = 0;
+  countdownHours = 0;
+  countdownMinutes = 0;
+  countdownSeconds = 0;
+  private countdownInterval: any;
 
   private thuocService = inject(ThuocService);
   private cdr = inject(ChangeDetectorRef); // 2. Công cụ ép Angular vẽ lại giao diện
@@ -25,6 +32,7 @@ export class HomeComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.startCountdown();
     this.thuocService.getDanhSachThuoc().subscribe({
       next: (data) => {
         this.danhSachThuoc = data;
@@ -36,6 +44,43 @@ export class HomeComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  private startCountdown(): void {
+    // Tính thời gian kết thúc (hôm nay lúc 24:00)
+    const targetDate = new Date();
+    targetDate.setHours(24, 0, 0, 0); // Nửa đêm hôm nay
+
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const distance = targetDate.getTime() - now;
+
+      if (distance < 0) {
+        // Flash sale đã kết thúc
+        this.countdownDays = 0;
+        this.countdownHours = 0;
+        this.countdownMinutes = 0;
+        this.countdownSeconds = 0;
+        clearInterval(this.countdownInterval);
+        return;
+      }
+
+      this.countdownDays = Math.floor(distance / (1000 * 60 * 60 * 24));
+      this.countdownHours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      this.countdownMinutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      this.countdownSeconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      this.cdr.detectChanges();
+    };
+
+    updateCountdown(); // Cập nhật ngay lần đầu
+    this.countdownInterval = setInterval(updateCountdown, 1000); // Cập nhật mỗi giây
+  }
+
+  ngOnDestroy(): void {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
   }
 
   chonTab(index: number) {

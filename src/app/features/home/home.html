@@ -29,8 +29,8 @@
     <div class="bg-white rounded-xl overflow-hidden">
       <div class="flex border-b text-sm text-center">
         <div class="flex-1 bg-[#fff0f0] p-3 border-r border-b-2 border-b-red-500 cursor-pointer">
-          <p class="font-bold text-gray-800">Ngày 21/4</p>
-          <p class="text-red-500 text-xs font-bold mt-1">Kết thúc sau <span class="bg-red-500 text-white px-1 rounded">01</span>:<span class="bg-red-500 text-white px-1 rounded">01</span>:<span class="bg-red-500 text-white px-1 rounded">59</span></p>
+          <p class="font-bold text-gray-800">Ngày hôm nay</p>
+          <p class="text-red-500 text-xs font-bold mt-1">Kết thúc sau <span class="bg-red-500 text-white px-1 rounded">{{ countdownHours.toString().padStart(2, '0') }}</span>:<span class="bg-red-500 text-white px-1 rounded">{{ countdownMinutes.toString().padStart(2, '0') }}</span>:<span class="bg-red-500 text-white px-1 rounded">{{ countdownSeconds.toString().padStart(2, '0') }}</span></p>
         </div>
         <div class="flex-1 p-3 border-r text-gray-500 hover:bg-gray-50 cursor-pointer"><p class="font-bold">Ngày 22/4</p><p class="text-xs mt-1">Sắp diễn ra</p></div>
         <div class="flex-1 p-3 text-gray-500 hover:bg-gray-50 cursor-pointer"><p class="font-bold">Ngày 23/4</p><p class="text-xs mt-1">Sắp diễn ra</p></div>
