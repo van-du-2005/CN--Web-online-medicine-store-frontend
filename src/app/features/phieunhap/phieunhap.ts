@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -6,7 +6,10 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-phieunhap',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './phieunhap.html'
+  templateUrl: './phieunhap.html',
+  styleUrl: './phieunhap.css',
+  encapsulation: ViewEncapsulation.ShadowDom,
+  
 })
 export class PhieuNhap implements OnInit {
   danhSachGoc: any[] = [];

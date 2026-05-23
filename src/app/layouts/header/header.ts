@@ -17,6 +17,13 @@ export class HeaderComponent implements OnInit {
   danhSachGoiY: Thuoc[] = [];
   hienThiGoiY = false;
 
+
+  // constructor(
+  //   private router: Router,
+  //   private storageService: StorageService,
+  // ) {}
+
+  // ngOnInit(): void {}
   private router = inject(Router);
   private storageService = inject(StorageService);
   private thuocService = inject(ThuocService);
@@ -34,6 +41,7 @@ export class HeaderComponent implements OnInit {
       } 
     });
   }
+
 
   isLoggedIn(): boolean {
     return !!this.storageService.getToken();
@@ -66,6 +74,15 @@ export class HeaderComponent implements OnInit {
       this.router.navigate(['/category'], { queryParams: { search: this.tuKhoaTimKiem } });
     }
   }
+
+
+  // navigateToHome() {
+  //   this.router.navigate(['/home']);
+  // }
+
+  // onSearch() {
+  //   console.log('Searching for:', this.searchQuery);
+  //   // Thêm logic tìm kiếm ở đây
 
   chonGoiY(thuoc: Thuoc) {
     this.tuKhoaTimKiem = thuoc.tenThuoc;

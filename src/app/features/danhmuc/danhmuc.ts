@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -6,7 +6,9 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-danhmuc',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './danhmuc.html'
+  templateUrl: './danhmuc.html',
+  styleUrl: './danhmuc.css',
+  encapsulation: ViewEncapsulation.ShadowDom
 })
 export class DanhMuc implements OnInit {
   danhSachGoc: any[] = [];
