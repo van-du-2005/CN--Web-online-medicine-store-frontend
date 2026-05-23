@@ -1,0 +1,192 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+    body { background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #334155; }
+    /* Badges */
+    .badge-status { padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; }
+    .badge-pending { background-color: #fff7ed; color: #ea580c; }
+    .badge-approved { background-color: #f0fdf4; color: #16a34a; }
+    .badge-rejected { background-color: #fef2f2; color: #dc2626; }
+    /* Left Card Item */
+    .list-card { border: 1px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; background: #fff; margin-bottom: 12px; display: flex; padding: 15px; }
+    .list-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+    .list-card.active { border-color: #3b82f6; background-color: #eff6ff; box-shadow: 0 0 0 1px #3b82f6; }
+    /* Icons */
+    .icon-box { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; margin-right: 15px;}
+    .icon-pending { background-color: #e0f2fe; color: #0284c7; }
+    .icon-approved { background-color: #dcfce7; color: #16a34a; }
+    .icon-rejected { background-color: #fee2e2; color: #dc2626; }
+    /* Layout elements */
+    .main-container { padding: 20px; height: 100vh; overflow: hidden; }
+    .left-panel { height: calc(100vh - 40px); display: flex; flex-direction: column; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 0; }
+    .right-panel { height: calc(100vh - 40px); overflow-y: auto; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; }
+    .panel-header { padding: 15px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+    .list-body { padding: 20px; overflow-y: auto; flex-grow: 1; }
+</style>
+
+<div class="container-fluid main-container">
+    <div class="row h-100">
+        
+        <div class="col-lg-4 col-md-5 h-100 pe-2">
+            <div class="left-panel shadow-sm">
+                <div class="panel-header">
+                    <h5 class="mb-0 fw-bold fs-6">Danh sách phiếu nhập</h5>
+                    <select class="form-select form-select-sm w-auto bg-light border-0" [(ngModel)]="trangThaiLoc" (ngModelChange)="locDuLieu()">
+                        <option value="TatCa">Tất cả trạng thái</option>
+                        <option value="ChoXuLy">Chờ duyệt</option>
+                        <option value="DaDuyet">Đã duyệt</option>
+                        <option value="TuChoi">Từ chối</option>
+                    </select>
+                </div>
+
+                <div class="list-body">
+                    <div *ngFor="let item of danhSachPhanTrang" 
+                         class="list-card" 
+                         [class.active]="selectedPhieu?.maPhieuNhap === item.maPhieuNhap" 
+                         (click)="xemChiTiet(item)">
+                        
+                        <div class="icon-box" [ngClass]="{'icon-pending': item.trangThai === 'ChoXuLy', 'icon-approved': item.trangThai === 'DaDuyet', 'icon-rejected': item.trangThai === 'TuChoi'}">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="fw-bold text-primary">PNK-{{ formatId(item.maPhieuNhap) }}</div>
+                                <span class="badge-status" [ngClass]="{'badge-pending': item.trangThai === 'ChoXuLy', 'badge-approved': item.trangThai === 'DaDuyet', 'badge-rejected': item.trangThai === 'TuChoi'}">
+                                    {{ item.trangThai === 'ChoXuLy' ? 'Chờ duyệt' : (item.trangThai === 'DaDuyet' ? 'Đã duyệt' : 'Từ chối') }}
+                                </span>
+                            </div>
+                            <div class="fw-semibold text-dark mb-2" style="font-size: 14px;">
+                                {{ item.nhaCungCap?.tenCongTy || 'Đang cập nhật...' }}
+                            </div>
+                            <div class="text-muted small d-flex align-items-center mb-1">
+                                <i class="bi bi-calendar3 me-2"></i> {{ item.ngayNhap | date:'dd/MM/yyyy HH:mm' }}
+                            </div>
+                            <div class="text-muted small d-flex justify-content-between align-items-center">
+                                <div><i class="bi bi-cash-coin me-2"></i> Tổng tiền: <strong class="text-dark">{{ (item.tongTien || 0) | number:'1.0-0' }} đ</strong></div>
+                                <i class="bi bi-chevron-right text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <nav class="mt-4">
+                        <ul class="pagination pagination-sm justify-content-center">
+                            <li class="page-item" [class.disabled]="currentPage === 1">
+                                <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage - 1)">&laquo;</a>
+                            </li>
+                            <li class="page-item" *ngFor="let page of pageNumbers" [class.active]="page === currentPage">
+                                <a class="page-link" href="javascript:void(0)" (click)="changePage(page)">{{ page }}</a>
+                            </li>
+                            <li class="page-item" [class.disabled]="currentPage === totalPages || totalPages === 0">
+                                <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage + 1)">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8 col-md-7 h-100 ps-2">
+            <div class="right-panel shadow-sm">
+                
+                <div *ngIf="!selectedPhieu" class="h-100 d-flex flex-column justify-content-center align-items-center text-muted">
+                    <i class="bi bi-inboxes text-primary opacity-50 mb-3" style="font-size: 4rem;"></i>
+                    <p class="fs-5">Vui lòng chọn một phiếu nhập bên trái để xem chi tiết.</p>
+                </div>
+
+                <div *ngIf="selectedPhieu" class="d-flex flex-column h-100">
+                    <div class="panel-header">
+                        <h5 class="mb-0 fw-bold fs-5">Chi tiết phiếu nhập</h5>
+                        <span class="badge-status fs-6" [ngClass]="{'badge-pending': selectedPhieu.trangThai === 'ChoXuLy', 'badge-approved': selectedPhieu.trangThai === 'DaDuyet', 'badge-rejected': selectedPhieu.trangThai === 'TuChoi'}">
+                            {{ selectedPhieu.trangThai === 'ChoXuLy' ? 'Chờ duyệt' : (selectedPhieu.trangThai === 'DaDuyet' ? 'Đã duyệt' : 'Từ chối') }}
+                        </span>
+                    </div>
+                    <div class="p-4" style="overflow-y: auto; flex-grow: 1;">
+                        <div class="border rounded-3 p-3 mb-4">
+                            <div class="row">
+                                <div class="col-md-5 border-end">
+                                    <div class="d-flex align-items-start">
+                                        <div class="icon-box icon-pending me-3" style="width: 50px; height: 50px; font-size: 24px;">
+                                            <i class="bi bi-file-earmark-text"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small mb-1">Mã phiếu nhập</div>
+                                            <h4 class="text-primary fw-bold mb-2">PNK-{{ formatId(selectedPhieu.maPhieuNhap) }}</h4>
+                                            <div class="small text-muted mb-1">Ngày nhập: <strong class="text-dark">{{ selectedPhieu.ngayNhap | date:'dd/MM/yyyy HH:mm' }}</strong></div>
+                                            <div class="small text-muted">Nhân viên kho tạo: <strong class="text-dark">Admin Kho</strong></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-7 ps-4">
+                                    <div class="text-muted small mb-1">Thông tin nhà cung cấp</div>
+                                    <h5 class="fw-bold mb-3 text-dark">{{ selectedPhieu.nhaCungCap?.tenCongTy || 'Đang cập nhật...' }}</h5>
+                                    <div class="small text-muted mb-2"><i class="bi bi-telephone-fill me-2"></i> <strong class="text-dark">{{ selectedPhieu.nhaCungCap?.soDienThoai || '---' }}</strong></div>
+                                    <div class="small text-muted"><i class="bi bi-geo-alt-fill me-2"></i> <strong class="text-dark">{{ selectedPhieu.nhaCungCap?.diaChi || '---' }}</strong></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4 g-3">
+                            <div class="col-md-3"><div class="border rounded-3 p-3 text-center h-100"><div class="text-muted small mb-1">Tổng số mặt hàng</div><h4 class="fw-bold text-dark mb-0">8</h4></div></div>
+                            <div class="col-md-3"><div class="border rounded-3 p-3 text-center h-100"><div class="text-muted small mb-1">Tổng số lô</div><h4 class="fw-bold text-dark mb-0">12</h4></div></div>
+                            <div class="col-md-3"><div class="border rounded-3 p-3 text-center h-100"><div class="text-muted small mb-1">Tổng số lượng</div><h4 class="fw-bold text-dark mb-0">258</h4></div></div>
+                            <div class="col-md-3"><div class="border rounded-3 p-3 text-center h-100 bg-light"><div class="text-muted small mb-1">Tổng tiền hàng</div><h4 class="fw-bold text-success mb-0">{{ (selectedPhieu.tongTien || 0) | number:'1.0-0' }} đ</h4></div></div>
+                        </div>
+
+                        <h6 class="fw-bold mb-3">Danh sách lô thuốc nhập</h6>
+                        <div class="table-responsive border rounded-3 mb-4">
+                            <table class="table table-borderless table-striped table-hover mb-0" style="font-size: 14px;">
+                                <thead class="border-bottom bg-light">
+                                    <tr>
+                                        <th class="py-3">STT</th><th class="py-3">Tên thuốc</th><th class="py-3">Dạng bào chế</th><th class="py-3 text-center">Số lượng</th>
+                                        <th class="py-3 text-end">Đơn giá nhập</th><th class="py-3 text-end">Thành tiền</th><th class="py-3 text-center">Số lô</th><th class="py-3 text-end">Hạn sử dụng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>1</td><td class="fw-semibold text-dark">Paracetamol 500mg</td><td>Viên nén</td><td class="text-center">50</td><td class="text-end">3.000 đ</td><td class="text-end">150.000 đ</td><td class="text-center">LOT240501</td><td class="text-end">10/09/2026</td></tr>
+                                    <tr><td>2</td><td class="fw-semibold text-dark">Amoxicillin 500mg</td><td>Viên nang</td><td class="text-center">30</td><td class="text-end">5.000 đ</td><td class="text-end">150.000 đ</td><td class="text-center">LOT240502</td><td class="text-end">05/08/2026</td></tr>
+                                    <tr><td>3</td><td class="fw-semibold text-dark">Vitamin C 500mg</td><td>Viên nén</td><td class="text-center">40</td><td class="text-end">2.500 đ</td><td class="text-end">100.000 đ</td><td class="text-center">LOT240503</td><td class="text-end">20/10/2026</td></tr>
+                                    <tr><td>4</td><td class="fw-semibold text-dark">Ibuprofen 400mg</td><td>Viên nén</td><td class="text-center">60</td><td class="text-end">3.500 đ</td><td class="text-end">210.000 đ</td><td class="text-center">LOT240504</td><td class="text-end">15/07/2026</td></tr>
+                                </tbody>
+                            </table>
+                            <div class="text-center py-2 bg-white border-top">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill px-4">Xem thêm 4 mặt hàng khác <i class="bi bi-chevron-down ms-1"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-dark">Ghi chú <span class="text-muted fw-normal">(nếu có)</span></label>
+                                <textarea class="form-control" rows="3" disabled>{{ selectedPhieu.ghiChu }}</textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-danger">Lý do từ chối <span class="fw-normal">(bắt buộc nếu từ chối)</span></label>
+                                <textarea class="form-control border-danger border-opacity-50" rows="3" placeholder="Nhập lý do từ chối..."></textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-dark">Thao tác</label>
+                                
+                                <div class="d-flex flex-column gap-2" *ngIf="selectedPhieu.trangThai === 'ChoXuLy'">
+                                    <button type="button" class="btn btn-danger fw-bold shadow-sm py-2" (click)="capNhatTrangThai(selectedPhieu.maPhieuNhap, 'TuChoi')">
+                                        <i class="bi bi-x-circle me-1"></i> Từ chối
+                                    </button>
+                                    <button type="button" class="btn btn-success fw-bold shadow-sm py-2" (click)="capNhatTrangThai(selectedPhieu.maPhieuNhap, 'DaDuyet')">
+                                        <i class="bi bi-check-circle me-1"></i> Phê duyệt <span class="fw-normal small d-block" style="font-size: 10px;">(Nhập kho)</span>
+                                    </button>
+                                </div>
+
+                                <div *ngIf="selectedPhieu.trangThai !== 'ChoXuLy'" class="alert alert-secondary text-center py-2 mb-0 border-0" style="border-radius: 8px;">
+                                    <i class="bi bi-lock-fill me-1"></i> Phiếu nhập này đã đóng
+                                </div>
+
+                                <div class="text-muted small mt-2 d-flex align-items-start" style="font-size: 11px;">
+                                    <i class="bi bi-info-circle-fill me-1 mt-1 text-primary"></i>
+                                    <span>Chỉ có thể thao tác khi phiếu nhập đang ở trạng thái Chờ duyệt.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
