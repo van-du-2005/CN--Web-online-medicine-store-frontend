@@ -7,11 +7,15 @@ import { AccountLayoutComponent } from './features/account/layout/account-layout
 import { ProfileComponent } from './features/account/profile/profile.component';
 import { OrdersComponent } from './features/account/orders/orders.component';
 import { AddressesComponent } from './features/account/addresses/addresses.component';
+
+// Import từ nhánh hiện tại (Customer & Home)
 import { CartComponent } from './features/Customer/cart/cart.component';
 import { CheckoutComponent } from './features/Customer/checkout/checkout.component';
 import { ProductDetailComponent } from './features/product-detail/product-detail';
 import { HomeComponent } from './features/home/home';
 import { CategoryComponent } from './features/category/category';
+
+// Import từ nhánh được merge (Admin)
 import { AdminLayoutComponent } from '../app/layouts/admin/admin-layout.component';
 import { DashboardComponent } from './features/admin/dashboard/dashboard.component';
 import { OrdersAdminComponent } from './features/admin/orders/orders-admin.component';
@@ -60,11 +64,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
-
-  // { 
-  //   // Tạm thời điều hướng trang chủ (localhost:4200) thẳng vào trang đăng nhập để dễ test
-  //   path: '', redirectTo: 'auth/login', pathMatch: 'full' 
-  // }
+  
   { path: '', component: HomeComponent }, // Khi vừa vào web sẽ hiển thị Trang Chủ
   { path: 'category', component: CategoryComponent },
   { path: 'product/detail/:id', component: ProductDetailComponent }
