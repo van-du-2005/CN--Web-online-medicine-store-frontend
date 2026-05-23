@@ -1,8 +1,3 @@
-//  import { Routes } from '@angular/router';
-
-
-// export const routes: Routes = [];
-
 import { Routes } from '@angular/router';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { LoginComponent } from './features/auth/login/login';
@@ -15,6 +10,13 @@ import { AddressesComponent } from './features/account/addresses/addresses.compo
 import { AdminLayoutComponent } from '../app/layouts/admin/admin-layout.component';
 import { DashboardComponent } from './features/admin/dashboard/dashboard.component';
 import { OrdersAdminComponent } from './features/admin/orders/orders-admin.component';
+import { CartComponent } from './features/Customer/cart/cart.component';
+import { CheckoutComponent } from './features/Customer/checkout/checkout.component';
+import { ProductDetailComponent } from './features/product-detail/product-detail';
+import { HomeComponent } from './features/home/home';
+import { CategoryComponent } from './features/category/category';
+
+import { ClientLayoutComponent } from './layouts/client-layout/client-layout.component';
 
 export const routes: Routes = [
   {
@@ -22,40 +24,75 @@ export const routes: Routes = [
     path: 'auth',
     component: AuthLayoutComponent,
     children: [
-      // Các route con sẽ được nhúng vào <router-outlet> của AuthLayout
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       { path: 'verify-otp', component: VerifyOtpComponent },
-      { path: '', redirectTo: 'login', pathMatch: 'full' }
-    ]
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
+    ],
   },
 
-  {
-    // Feature: Account (Dùng Layout riêng chứa Sidebar)
-    path: 'account',
-    component: AccountLayoutComponent,
-    children: [
-      { path: 'profile', component: ProfileComponent },
-      { path: 'orders', component: OrdersComponent },
-      { path: 'addresses', component: AddressesComponent },
-      { path: '', redirectTo: 'profile', pathMatch: 'full' }
-    ]
-  },
-  
+  // {
+  //   // Feature: Account (Dùng Layout riêng chứa Sidebar)
+  //   path: 'account',
+  //   component: AccountLayoutComponent,
+  //   children: [
+  //     { path: 'profile', component: ProfileComponent },
+  //     { path: 'orders', component: OrdersComponent },
+  //     { path: 'addresses', component: AddressesComponent },
+  //     { path: '', redirectTo: 'profile', pathMatch: 'full' },
+  //   ],
+  // },
+
+  // {
+  //   path: 'cart',
+  //   component: CartComponent
+  // },
+  // {
+  //     path: 'checkout',
+  //     component: CheckoutComponent
+  // },
+
   {
     path: 'admin',
     component: AdminLayoutComponent,
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'orders', component: OrdersAdminComponent },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
-    ]
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    ],
+  },
+  {
+    // Feature: Client/Store (Layout Khách hàng có Header và Chatbot)
+    // Các trang như Trang chủ, Giỏ hàng, Sản phẩm sẽ nằm trong này
+    path: '',
+    component: ClientLayoutComponent,
+    children: [
+      { path: 'home', component: HomeComponent },
+      // { path: 'cart', component: CartComponent },
+      { path: 'cart', component: CartComponent },
+      { path: 'checkout', component: CheckoutComponent },
+      { path: 'category', component: CategoryComponent },
+      { path: 'product/detail/:id', component: ProductDetailComponent },
+
+      {
+        path: 'account',
+        component: AccountLayoutComponent,
+        children: [
+          { path: 'profile', component: ProfileComponent },
+          { path: 'orders', component: OrdersComponent },
+          { path: 'addresses', component: AddressesComponent },
+          { path: '', redirectTo: 'profile', pathMatch: 'full' },
+        ],
+      },
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+    ],
   },
 
-  { 
-    // Tạm thời điều hướng trang chủ (localhost:4200) thẳng vào trang đăng nhập để dễ test
-    path: '', redirectTo: 'auth/login', pathMatch: 'full' 
-  }
+  // {
+  //   // Tạm thời điều hướng trang chủ (localhost:4200) thẳng vào trang đăng nhập để dễ test
+  //   path: '', redirectTo: 'auth/login', pathMatch: 'full'
+  // }
+  { path: '', component: HomeComponent }, // Khi vừa vào web sẽ hiển thị Trang Chủ
+  // { path: 'category', component: CategoryComponent },
+  // { path: 'product/detail/:id', component: ProductDetailComponent }
 ];
-
-
