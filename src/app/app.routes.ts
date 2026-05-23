@@ -1,32 +1,50 @@
 import { Routes } from '@angular/router';
+
+// ------------------- AUTH LAYOUT & FEATURES -------------------
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { VerifyOtpComponent } from './features/auth/verify-otp/verify-otp';
+
+// ------------------- CUSTOMER ACCOUNT FEATURES -------------------
 import { AccountLayoutComponent } from './features/account/layout/account-layout.component';
 import { ProfileComponent } from './features/account/profile/profile.component';
 import { OrdersComponent } from './features/account/orders/orders.component';
 import { AddressesComponent } from './features/account/addresses/addresses.component';
 
-// Import từ nhánh hiện tại (Customer & Home)
-import { CartComponent } from './features/Customer/cart/cart.component';
-import { CheckoutComponent } from './features/Customer/checkout/checkout.component';
-import { ProductDetailComponent } from './features/product-detail/product-detail';
+// ------------------- CUSTOMER MARKETPLACE FEATURES -------------------
 import { HomeComponent } from './features/home/home';
 import { CategoryComponent } from './features/category/category';
+import { ProductDetailComponent } from './features/product-detail/product-detail';
+import { CartComponent } from './features/Customer/cart/cart.component';
+import { CheckoutComponent } from './features/Customer/checkout/checkout.component';
 
-// Import từ nhánh được merge (Admin)
+// ------------------- ADMIN SYSTEM FEATURES -------------------
 import { AdminLayoutComponent } from '../app/layouts/admin/admin-layout.component';
 import { DashboardComponent } from './features/admin/dashboard/dashboard.component';
 import { OrdersAdminComponent } from './features/admin/orders/orders-admin.component';
+import { Thuoc } from './features/thuoc/thuoc';
+import { DanhMuc } from './features/danhmuc/danhmuc';
+import { NhaCungCap } from './features/nhacungcap/nhacungcap';
+import { PhieuNhap } from './features/phieunhap/phieunhap';
 
 export const routes: Routes = [
+  // =========================================================================
+  // 1. NHÓM ROUTE KHÁCH HÀNG (CUSTOMER & MARKETPLACE)
+  // =========================================================================
+  { path: '', component: HomeComponent }, // Vào web hiển thị luôn trang chủ của khách
+  { path: 'category', component: CategoryComponent },
+  { path: 'product/detail/:id', component: ProductDetailComponent },
+  { path: 'cart', component: CartComponent },
+  { path: 'checkout', component: CheckoutComponent },
+
+  // =========================================================================
+  // 2. NHÓM ROUTE XÁC THỰC (AUTHENTICATION)
+  // =========================================================================
   {
-    // Route: auth
     path: 'auth',
     component: AuthLayoutComponent,
     children: [
-      // Các route con sẽ được nhúng vào <router-outlet> của AuthLayout
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       { path: 'verify-otp', component: VerifyOtpComponent },
@@ -34,8 +52,10 @@ export const routes: Routes = [
     ]
   },
 
+  // =========================================================================
+  // 3. NHÓM ROUTE TÀI KHOẢN KHÁCH HÀNG (USER ACCOUNT PROFILE)
+  // =========================================================================
   {
-    // Feature: Account (Dùng Layout riêng chứa Sidebar)
     path: 'account',
     component: AccountLayoutComponent,
     children: [
@@ -46,43 +66,30 @@ export const routes: Routes = [
     ]
   },
 
-  {
-    path: 'cart',
-    component: CartComponent
-  },
-  {
-    path: 'checkout',
-    component: CheckoutComponent
-  },
-  
+  // =========================================================================
+  // 4. NHÓM ROUTE QUẢN TRỊ VIÊN (ADMIN DASHBOARD & MANAGEMENT)
+  // =========================================================================
   {
     path: 'admin',
     component: AdminLayoutComponent,
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'orders', component: OrdersAdminComponent },
+      
+      // Hợp nhất các route quản lý danh mục cốt lõi vào layout Admin làm route con
+      { path: 'thuoc', component: Thuoc },
+      { path: 'danhmuc', component: DanhMuc },
+      { path: 'nhacungcap', component: NhaCungCap },
+      { path: 'phieunhap', component: PhieuNhap },
+      
+      // Nếu truy cập /admin mà để trống, tự động chuyển đến trang dashboard
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
-  
-  { path: '', component: HomeComponent }, // Khi vừa vào web sẽ hiển thị Trang Chủ
-  { path: 'category', component: CategoryComponent },
-  { path: 'product/detail/:id', component: ProductDetailComponent }
-];
-// Nhập khẩu 2 giao diện anh em mình đã làm
-import { Thuoc } from './features/thuoc/thuoc';
-import { DanhMuc } from './features/danhmuc/danhmuc';
-import { NhaCungCap } from './features/nhacungcap/nhacungcap';
-import { PhieuNhap } from './features/phieunhap/phieunhap';
-export const routes: Routes = [
-  // 1. Nếu vô trang chủ (localhost:4200), tự động đẩy sang trang Thuốc
-  { path: '', redirectTo: 'thuoc', pathMatch: 'full' },
-  
-  // 2. Link localhost:4200/thuoc sẽ mở trang Quản lý Thuốc
-  { path: 'thuoc', component: Thuoc },
-  
-  // 3. Link localhost:4200/danhmuc sẽ mở trang Quản lý Danh Mục
-  { path: 'danhmuc', component: DanhMuc },
-  { path: 'nhacungcap', component: NhaCungCap },
-  { path: 'phieunhap', component: PhieuNhap }
+
+  // =========================================================================
+  // 5. ĐIỀU HƯỚNG BẢO VỆ (FALLBACK ROUTE)
+  // =========================================================================
+  // Nếu gõ bừa một đường dẫn không tồn tại, tự động đá ngược về Trang Chủ khách hàng
+  { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
