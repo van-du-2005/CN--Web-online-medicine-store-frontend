@@ -91,8 +91,8 @@ export class OrdersComponent implements OnInit {
   }
 
   // Tiện ích UI
-  getShortId(id: string): string {
-    return id.length >= 8 ? id.substring(0, 8).toUpperCase() : id.toUpperCase();
+  getFullId(id: string): string {
+    return id.toUpperCase();
   }
 
   getStatusLabel(status: string): string {

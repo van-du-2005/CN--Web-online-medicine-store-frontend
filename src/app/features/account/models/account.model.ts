@@ -33,6 +33,9 @@ export interface OrderHistory {
   maDonHang: string;
   ngayDat: string;
   trangThai: string;
+  tamTinh: number;
+  phiVanChuyen: number;
+  giamGia: number;
   thanhToan: number;
   chiTiet: OrderDetail[];
 }

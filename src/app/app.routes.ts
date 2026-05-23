@@ -12,6 +12,9 @@ import { CheckoutComponent } from './features/Customer/checkout/checkout.compone
 import { ProductDetailComponent } from './features/product-detail/product-detail';
 import { HomeComponent } from './features/home/home';
 import { CategoryComponent } from './features/category/category';
+import { AdminLayoutComponent } from '../app/layouts/admin/admin-layout.component';
+import { DashboardComponent } from './features/admin/dashboard/dashboard.component';
+import { OrdersAdminComponent } from './features/admin/orders/orders-admin.component';
 
 export const routes: Routes = [
   {
@@ -48,7 +51,15 @@ export const routes: Routes = [
     component: CheckoutComponent
   },
   
-  { path: 'profile', redirectTo: 'account/profile', pathMatch: 'full' },
+  {
+    path: 'admin',
+    component: AdminLayoutComponent,
+    children: [
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'orders', component: OrdersAdminComponent },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+    ]
+  },
 
   // { 
   //   // Tạm thời điều hướng trang chủ (localhost:4200) thẳng vào trang đăng nhập để dễ test

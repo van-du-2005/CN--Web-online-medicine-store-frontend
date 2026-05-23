@@ -8,19 +8,23 @@ import { UserProfile, ChangePassword } from '../models/account.model';
   selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './profile.component.html'
+  templateUrl: './profile.component.html',
 })
 export class ProfileComponent implements OnInit {
   profile: UserProfile = { hoTen: '', hangThanhVien: '', diemTichLuy: 0 };
   passwordData: ChangePassword = { matKhauCu: '', matKhauMoi: '' };
   xacNhanMatKhau = '';
 
+  showMatKhauCu = false;
+  showMatKhauMoi = false;
+  showXacNhanMatKhau = false;
+
   isEditMode = false;
   showPasswordSection = false;
-  
+
   isLoading = true;
   isSaving = false;
-  
+
   successMessage = '';
   errorMessage = '';
   passSuccessMessage = '';
@@ -28,8 +32,18 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private accountService: AccountService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
+
+  toggleMatKhauCu(): void {
+    this.showMatKhauCu = !this.showMatKhauCu;
+  }
+  toggleMatKhauMoi(): void {
+    this.showMatKhauMoi = !this.showMatKhauMoi;
+  }
+  toggleXacNhanMatKhau(): void {
+    this.showXacNhanMatKhau = !this.showXacNhanMatKhau;
+  }
 
   ngOnInit(): void {
     this.loadProfile();
@@ -47,7 +61,7 @@ export class ProfileComponent implements OnInit {
         this.errorMessage = 'Không thể tải thông tin. Vui lòng thử lại sau.';
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -71,7 +85,7 @@ export class ProfileComponent implements OnInit {
 
     this.isSaving = true;
     this.errorMessage = '';
-    
+
     this.accountService.updateProfile(this.profile).subscribe({
       next: (res) => {
         this.isSaving = false;
@@ -79,7 +93,10 @@ export class ProfileComponent implements OnInit {
           this.successMessage = res.message;
           this.isEditMode = false;
           // Thông báo thành công tự tắt sau 3s
-          setTimeout(() => { this.successMessage = ''; this.cdr.detectChanges(); }, 3000);
+          setTimeout(() => {
+            this.successMessage = '';
+            this.cdr.detectChanges();
+          }, 3000);
         }
         this.cdr.detectChanges();
       },
@@ -87,7 +104,7 @@ export class ProfileComponent implements OnInit {
         this.isSaving = false;
         this.errorMessage = err.error?.message || 'Có lỗi xảy ra khi lưu thông tin.';
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -124,7 +141,7 @@ export class ProfileComponent implements OnInit {
         this.isSaving = false;
         this.passErrorMessage = err.error?.message || 'Không thể đổi mật khẩu.';
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 }
