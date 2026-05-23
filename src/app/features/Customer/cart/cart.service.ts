@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CartDto } from './cart.model';
 import { StorageService } from '../../../services/storage.service';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class CartService {
   private http = inject(HttpClient);
   private storageService = inject(StorageService);
 
-  private apiUrl = 'http://localhost:5237/api/cart';
+  private apiUrl = `${environment.apiUrl}/api/cart`;
 
   private getAuthHeaders(): HttpHeaders {
     const token = this.storageService.getToken();
