@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-blue-50 p-6">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
   
   <!-- Loading trạng thái -->
   <div *ngIf="isLoading" class="flex justify-center items-center py-20 text-blue-600">
@@ -10,11 +10,11 @@
   </div>
 
   <!-- Giỏ hàng Trống -->
-  <div *ngIf="!isLoading && cartData.items.length === 0" class="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-10 text-center">
-    <div class="text-gray-400 mb-4 text-5xl">🛒</div>
-    <h2 class="text-xl font-bold text-gray-700 mb-2">Giỏ hàng của bạn đang trống</h2>
-    <p class="text-gray-500 mb-6">Hãy tìm thêm các sản phẩm thuốc và y tế cần thiết nhé!</p>
-    <button routerLink="/" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
+  <div *ngIf="!isLoading && cartData.items.length === 0" class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-12 text-center">
+    <div class="text-gray-400 mb-4 text-6xl">🛒</div>
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">Giỏ hàng của bạn đang trống</h2>
+    <p class="text-gray-500 mb-8 text-base">Hãy tìm thêm các sản phẩm thuốc và y tế cần thiết nhé!</p>
+    <button routerLink="/" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition duration-300">
       Tiếp tục mua sắm
     </button>
   </div>
@@ -23,51 +23,53 @@
   <div *ngIf="!isLoading && cartData.items.length > 0" class="max-w-6xl mx-auto grid grid-cols-12 gap-6">
     
     <!-- Cột bên trái: Sản phẩm -->
-    <div class="col-span-12 lg:col-span-8 bg-white rounded-lg shadow-sm p-4">
-      <div class="flex items-center justify-between pb-4 border-b border-gray-100">
-        <label class="flex items-center gap-2 cursor-pointer font-medium text-gray-700">
+    <div class="col-span-12 lg:col-span-8 bg-white rounded-2xl shadow-lg p-6">
+      <div class="flex items-center justify-between pb-5 border-b border-gray-200">
+        <label class="flex items-center gap-3 cursor-pointer font-semibold text-gray-800">
           <input 
             type="checkbox" 
             [checked]="isAllSelected()" 
             (change)="toggleAll($event)"
-            class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+            class="w-5 h-5 rounded-lg text-blue-600 focus:ring-2 focus:ring-blue-400 cursor-pointer"
           > 
           Chọn tất cả ({{ cartData.items.length }} sản phẩm)
         </label>
       </div>
 
       <!-- Item sản phẩm -->
-      <div *ngFor="let item of cartData.items" class="flex items-center gap-4 py-4 border-b border-gray-100 last:border-0">
+      <div *ngFor="let item of cartData.items" class="flex items-center gap-4 py-5 px-3 border-b border-gray-100 last:border-0 hover:bg-blue-50 rounded-xl transition">
         <input 
           type="checkbox" 
           [(ngModel)]="item.selected"
-          class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+          class="w-5 h-5 rounded-lg text-blue-600 focus:ring-2 focus:ring-blue-400 cursor-pointer flex-shrink-0"
         >
         
-        <img [src]="item.hinhAnh || 'assets/images/no-image.png'" class="w-16 h-16 object-cover rounded-md border border-gray-100 flex-shrink-0">
+        <img [src]="item.hinhAnh || 'assets/images/no-image.png'" class="w-20 h-20 object-cover rounded-xl border border-gray-200 flex-shrink-0 shadow-md">
         
         <div class="flex-1 min-w-0">
           <!-- Đã cập nhật đúng chuẩn khớp hiển thị biến item.tenThuoc -->
-          <p class="font-medium text-gray-800 truncate text-sm md:text-base">{{ item.tenThuoc }}</p>
+          <p class="font-semibold text-gray-800 truncate text-sm md:text-base">{{ item.tenThuoc }}</p>
         </div>
         
-        <div class="font-bold text-blue-600 w-24 text-right flex-shrink-0">
+        <div class="font-bold text-blue-600 w-24 text-right flex-shrink-0 text-lg">
           {{ item.gia | number:'1.0-0' }}đ
         </div>
         
         <!-- Bộ đếm số lượng -->
-        <div class="flex items-center border border-gray-300 rounded-md overflow-hidden flex-shrink-0">
+        <div class="flex items-center border border-gray-300 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50">
           <button (click)="decrease(item)" 
                   [disabled]="item.soLuong <= 1"
-                  class="px-3 py-1 bg-gray-50 hover:bg-gray-200 disabled:opacity-50 font-bold transition">-</button>
+                  class="px-3 py-2 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed font-bold transition text-gray-700">−</button>
                   
-          <input type="text" [value]="item.soLuong" readonly class="w-10 text-center text-sm outline-none bg-white font-medium">
+          <input type="text" [value]="item.soLuong" readonly class="w-10 text-center text-sm outline-none bg-white font-semibold text-gray-800">
           
-          <button (click)="increase(item)" class="px-3 py-1 bg-gray-50 hover:bg-gray-200 font-bold transition">+</button>
+          <button (click)="increase(item)" class="px-3 py-2 hover:bg-gray-200 font-bold transition text-gray-700">+</button>
         </div>
         
-        <!-- Nút xóa item (Mã SVG) -->
-        <button (click)="removeItem(item.maThuoc)" class="ml-2 text-gray-400 hover:text-red-500 transition flex-shrink-0">
+        <!-- Nút xóa item -->
+        <button (click)="removeItem(item.maThuoc)" 
+                class="ml-3 p-2 bg-gray-100 border border-gray-300 text-gray-400 hover:text-red-500 hover:bg-red-50 hover:border-red-300 rounded-lg transition flex-shrink-0"
+                title="Xóa sản phẩm">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
           </svg>
@@ -77,33 +79,33 @@
 
     <!-- Cột bên phải: Thanh toán -->
     <div class="col-span-12 lg:col-span-4">
-      <div class="bg-white rounded-lg shadow-sm p-5 sticky top-4">
-        <h2 class="text-lg font-bold mb-4 text-gray-800">Tổng tiền</h2>
+      <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-4">
+        <h2 class="text-xl font-bold mb-5 text-gray-800">Tổng tiền</h2>
         
-        <div class="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-md cursor-pointer border border-dashed border-gray-300 hover:bg-gray-100 transition">
-          <span class="text-gray-600 text-sm">🎟 Khuyến mãi</span>
-          <span class="text-blue-600 font-medium text-sm">Chọn mã</span>
+        <div class="flex items-center justify-between mb-5 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl cursor-pointer border border-dashed border-amber-300 hover:from-yellow-100 hover:to-amber-100 transition duration-300 group">
+          <span class="text-gray-700 text-sm font-semibold">🎟 Khuyến mãi</span>
+          <span class="text-amber-600 font-bold text-sm group-hover:text-amber-700">Chọn mã</span>
         </div>
 
-        <div class="space-y-3 text-sm">
+        <div class="space-y-3 text-sm bg-gray-50 rounded-xl p-4">
           <div class="flex justify-between text-gray-600">
-            <span>Tạm tính</span>
-            <span class="font-medium text-gray-800">{{ getTotal() | number:'1.0-0' }}đ</span>
+            <span class="font-medium">Tạm tính</span>
+            <span class="font-semibold text-gray-800">{{ getTotal() | number:'1.0-0' }}đ</span>
           </div>
           <div class="flex justify-between text-gray-600">
-            <span>Giảm giá</span>
-            <span>0đ</span>
+            <span class="font-medium">Giảm giá</span>
+            <span class="font-semibold text-gray-800">0đ</span>
           </div>
-          <div class="pt-3 border-t border-gray-100 font-bold text-lg flex justify-between">
-            <span>Tổng tiền</span>
-            <span class="text-blue-600">{{ getTotal() | number:'1.0-0' }}đ</span>
+          <div class="pt-3 border-t border-gray-200 font-bold text-lg flex justify-between">
+            <span class="text-gray-800">Tổng tiền</span>
+            <span class="bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">{{ getTotal() | number:'1.0-0' }}đ</span>
           </div>
         </div>
 
         <button 
           (click)="proceedToCheckout()"
           [disabled]="getTotal() === 0"
-          class="w-full mt-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition shadow-md"
+          class="w-full mt-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold hover:shadow-lg hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:scale-100 transition duration-300 shadow-md"
         >
           Tiến hành thanh toán
         </button>

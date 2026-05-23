@@ -123,9 +123,11 @@ export class CartComponent implements OnInit {
     this.cartData.items.forEach(item => item.selected = isChecked);
   }
 
-  // Tính tổng tiền
+  // Tính tổng tiền (chỉ những sản phẩm được chọn)
   getTotal(): number {
     if (!this.cartData.items) return 0;
-    return this.cartData.items.reduce((sum, item) => sum + (item.gia * item.soLuong), 0);
+    return this.cartData.items
+      .filter(item => item.selected)
+      .reduce((sum, item) => sum + (item.gia * item.soLuong), 0);
   }
 }

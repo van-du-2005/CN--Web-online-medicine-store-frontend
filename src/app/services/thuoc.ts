@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Thuoc {
   maThuoc: string;
@@ -16,7 +17,7 @@ export interface Thuoc {
   providedIn: 'root'
 })
 export class ThuocService {
-  private apiUrl = 'http://localhost:5237/api/Thuoc';
+  private apiUrl = `${environment.apiUrl}/api/Thuoc`;
   private http = inject(HttpClient);
 
   getDanhSachThuoc(): Observable<Thuoc[]> {

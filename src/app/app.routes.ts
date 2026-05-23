@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
@@ -18,9 +19,19 @@ import { CategoryComponent } from './features/category/category';
 
 import { ClientLayoutComponent } from './layouts/client-layout/client-layout.component';
 
+import { Thuoc } from './features/thuoc/thuoc';
+import { DanhMuc } from './features/danhmuc/danhmuc';
+import { NhaCungCap } from './features/nhacungcap/nhacungcap';
+import { PhieuNhap } from './features/phieunhap/phieunhap';
+
 export const routes: Routes = [
+  // { path: '', component: HomeComponent }, // Vào web hiển thị luôn trang chủ của khách
+  // { path: 'category', component: CategoryComponent },
+  // { path: 'product/detail/:id', component: ProductDetailComponent },
+  // { path: 'cart', component: CartComponent },
+  // { path: 'checkout', component: CheckoutComponent },
+
   {
-    // Route: auth
     path: 'auth',
     component: AuthLayoutComponent,
     children: [
@@ -30,7 +41,6 @@ export const routes: Routes = [
       { path: '', redirectTo: 'login', pathMatch: 'full' },
     ],
   },
-
   // {
   //   // Feature: Account (Dùng Layout riêng chứa Sidebar)
   //   path: 'account',
@@ -51,19 +61,21 @@ export const routes: Routes = [
   //     path: 'checkout',
   //     component: CheckoutComponent
   // },
-
   {
     path: 'admin',
     component: AdminLayoutComponent,
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'orders', component: OrdersAdminComponent },
+      { path: 'thuoc', component: Thuoc },
+      { path: 'danhmuc', component: DanhMuc },
+      { path: 'nhacungcap', component: NhaCungCap },
+      { path: 'phieunhap', component: PhieuNhap },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
+
   {
-    // Feature: Client/Store (Layout Khách hàng có Header và Chatbot)
-    // Các trang như Trang chủ, Giỏ hàng, Sản phẩm sẽ nằm trong này
     path: '',
     component: ClientLayoutComponent,
     children: [
@@ -93,6 +105,23 @@ export const routes: Routes = [
   //   path: '', redirectTo: 'auth/login', pathMatch: 'full'
   // }
   { path: '', component: HomeComponent }, // Khi vừa vào web sẽ hiển thị Trang Chủ
+  { path: '**', redirectTo: '', pathMatch: 'full' },
   // { path: 'category', component: CategoryComponent },
   // { path: 'product/detail/:id', component: ProductDetailComponent }
 ];
+
+//     // Hợp nhất các route quản lý danh mục cốt lõi vào layout Admin làm route con
+//     { path: 'thuoc', component: Thuoc },
+//     { path: 'danhmuc', component: DanhMuc },
+//     { path: 'nhacungcap', component: NhaCungCap },
+//     { path: 'phieunhap', component: PhieuNhap },
+
+//     // Nếu truy cập /admin mà để trống, tự động chuyển đến trang dashboard
+//     { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+//   ]
+// },
+
+// =========================================================================
+// 5. ĐIỀU HƯỚNG BẢO VỆ (FALLBACK ROUTE)
+// =========================================================================
+// Nếu gõ bừa một đường dẫn không tồn tại, tự động đá ngược về Trang Chủ khách hàng
