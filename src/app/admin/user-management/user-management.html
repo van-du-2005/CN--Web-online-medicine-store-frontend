@@ -1,0 +1,104 @@
+<div class="px-8 pt-8 pb-8 flex-1 h-full overflow-auto bg-[#f4f7fa] font-sans">
+    
+    <div class="flex justify-between items-start mb-6">
+        <h2 class="text-[32px] font-bold text-gray-900">Quản lý người dùng</h2>
+        <div class="relative w-72">
+            <input type="text" [(ngModel)]="tuKhoaTimKiem" (ngModelChange)="onSearch()" placeholder="Tìm kiếm tên, email, SĐT..." class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 outline-none focus:border-green-500 shadow-sm text-sm">
+            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        
+        <div class="flex justify-between items-end mb-6">
+            <div class="flex gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2">Vai trò</label>
+                    <select class="border border-gray-200 text-sm rounded-lg px-4 py-2 w-48 outline-none focus:border-green-500 bg-white">
+                        <option>Tất cả</option>
+                        <option>Admin</option>
+                        <option>Dược sĩ</option>
+                        <option>Thu ngân</option>
+                        <option>Nhân viên kho</option>
+                        <option>Khách hàng</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2">Trạng thái</label>
+                    <select class="border border-gray-200 text-sm rounded-lg px-4 py-2 w-48 outline-none focus:border-green-500 bg-white">
+                        <option>Hoạt động</option>
+                        <option>Bị khóa</option>
+                    </select>
+                </div>
+            </div>
+            <button (click)="moFormThem()" class="bg-[#0f9d58] hover:bg-green-700 transition-colors text-white font-bold py-2.5 px-5 rounded-lg flex items-center gap-2">
+                <i class="fas fa-plus text-xs"></i> Thêm tài khoản
+            </button>
+        </div>
+
+        <div class="overflow-hidden border border-gray-100 rounded-lg mb-4">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50/50 border-b border-gray-100 text-gray-600 font-bold text-xs">
+                    <tr>
+                        <th class="py-4 px-4 w-12 text-center">ID</th>
+                        <th class="py-4 px-4">Họ tên</th>
+                        <th class="py-4 px-4">Email</th>
+                        <th class="py-4 px-4">SĐT</th>
+                        <th class="py-4 px-4">Vai trò</th>
+                        <th class="py-4 px-4">Trạng thái</th>
+                        <th class="py-4 px-4 text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @for (user of danhSachHienThi; track user.id) {
+                    <tr class="hover:bg-blue-50/50 transition-colors cursor-pointer group" (click)="xemChiTiet(user)">
+                        <td class="py-3 px-4 text-center text-gray-500">{{ user.id }}</td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-3">
+                                <img [src]="user.avatar" class="w-8 h-8 rounded-full border border-gray-200">
+                                <div>
+                                    <p class="font-bold text-gray-800">{{ user.hoTen }}</p>
+                                    <p class="text-[10px] font-black mt-0.5" [ngClass]="getRoleColor(user.vaiTro)">{{ user.vaiTro }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-gray-600">{{ user.email }}</td>
+                        <td class="py-3 px-4 text-gray-600">{{ user.sdt }}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-3 py-1 rounded text-xs font-bold" [ngClass]="getRoleBadgeColor(user.vaiTro)">{{ user.vaiTro }}</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-1.5 text-sm font-bold" [ngClass]="user.trangThai ? 'text-green-600' : 'text-red-500'">
+                                <div class="w-1.5 h-1.5 rounded-full" [ngClass]="user.trangThai ? 'bg-green-500' : 'bg-red-500'"></div>
+                                {{ user.trangThai ? 'Hoạt động' : 'Bị khóa' }}
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <button (click)="moFormSua(user, $event)" class="w-7 h-7 rounded border border-gray-200 hover:text-blue-600 hover:bg-blue-50"><i class="far fa-edit text-xs"></i></button>
+                                <button (click)="toggleTrangThai(user, $event)" class="w-7 h-7 rounded border border-gray-200 hover:text-orange-600 hover:bg-orange-50"><i class="fas" [ngClass]="user.trangThai ? 'fa-lock' : 'fa-lock-open'"></i></button>
+                                <button (click)="xacNhanXoa(user, $event)" class="w-7 h-7 rounded border border-red-100 text-red-400 hover:bg-red-50 hover:text-red-600"><i class="far fa-trash-alt text-xs"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex justify-between items-center text-sm text-gray-500 mt-6 mb-2">
+            <span>{{ textHienThi }}</span>
+            <div class="flex gap-2" *ngIf="tongSoTrang > 1">
+                <button (click)="trangTruoc()" [disabled]="trangHienTai === 1" class="w-8 h-8 rounded border border-gray-200 hover:bg-gray-50 disabled:opacity-50"><i class="fas fa-chevron-left text-xs"></i></button>
+                @for (page of getPagesArray; track page) {
+                   <button (click)="chuyenTrang(page)" class="w-8 h-8 rounded border transition-colors" [ngClass]="trangHienTai === page ? 'bg-[#0f9d58] text-white border-[#0f9d58] font-bold' : 'border-gray-200 hover:bg-gray-50 text-gray-600'">{{ page }}</button>
+                }
+                <button (click)="trangTiep()" [disabled]="trangHienTai === tongSoTrang" class="w-8 h-8 rounded border border-gray-200 hover:bg-gray-50 disabled:opacity-50"><i class="fas fa-chevron-right text-xs"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (hienThiForm) { ... }
+@if (hienThiChiTiet && selectedUser) { ... }
+@if (hienThiXacNhanXoa) { ... }

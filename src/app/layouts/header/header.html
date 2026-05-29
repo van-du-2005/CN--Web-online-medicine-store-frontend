@@ -1,0 +1,85 @@
+
+<style>
+</style>
+
+<!-- Top Header -->
+<header class="bg-[#2a7bfa] py-3 shadow-md sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-4 flex items-center gap-6">
+
+    <!-- Logo -->
+    <a routerLink="/" class="flex-shrink-0 flex items-center gap-2 text-white no-underline">
+      <div class="bg-white p-1 rounded-xl border-2 border-green-500 w-12 h-12 flex items-center justify-center">
+        <i class="fa-solid fa-leaf text-green-500 text-2xl"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-[10px] font-bold tracking-widest uppercase leading-none">Nhà thuốc</span>
+        <span class="text-xl font-black italic leading-none font-serif">Sống Khỏe</span>
+      </div>
+    </a>
+
+    <!-- Search -->
+    <div class="flex-1 max-w-2xl relative">
+      <form (ngSubmit)="timKiem()" class="flex bg-white rounded-full overflow-hidden shadow-inner h-10 border-2 border-transparent focus-within:border-blue-400 transition-colors relative z-50">
+        <input
+          type="text"
+          name="search"
+          [(ngModel)]="tuKhoaTimKiem"
+          (ngModelChange)="onTimKiemThayDoi()"
+          (focus)="onTimKiemThayDoi()"
+          (blur)="anGoiY()"
+          autocomplete="off"
+          placeholder="Tìm kiếm tên thuốc, triệu chứng, hoạt chất..."
+          class="flex-1 border-none outline-none px-5 text-sm w-full"
+        />
+        <button type="submit" class="px-5 text-gray-500 hover:text-blue-600 transition-colors bg-gray-50">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </form>
+
+      <!-- Dropdown gợi ý có kết quả -->
+      <div *ngIf="hienThiGoiY && danhSachGoiY.length > 0"
+        class="absolute top-full mt-2 left-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
+        <div class="px-4 py-2 bg-gray-50 border-b border-gray-100 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+          Gợi ý sản phẩm
+        </div>
+        <div class="max-h-[320px] overflow-y-auto">
+          <div *ngFor="let thuoc of danhSachGoiY"
+            (mousedown)="chonGoiY(thuoc)"
+            class="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer transition-colors border-b border-gray-50 last:border-0 group">
+            <img [src]="thuoc.hinhAnh || 'assets/images/no-image.png'"
+              class="w-12 h-12 object-contain p-1 bg-white rounded-lg border border-gray-100 group-hover:border-blue-200 transition-colors flex-shrink-0">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-gray-800 truncate group-hover:text-blue-600 transition-colors">{{ thuoc.tenThuoc }}</p>
+              <span class="text-xs text-blue-600 font-black">{{ thuoc.giaBan | number:'1.0-0' }}đ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dropdown không có kết quả -->
+      <div *ngIf="hienThiGoiY && tuKhoaTimKiem.length > 0 && danhSachGoiY.length === 0"
+        class="absolute top-full mt-2 left-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-6 z-50 text-center">
+        <p class="text-sm text-gray-500">Không tìm thấy kết quả cho <strong class="text-gray-800">"{{ tuKhoaTimKiem }}"</strong></p>
+        <p class="text-xs text-gray-400 mt-1">Vui lòng thử lại với từ khóa khác.</p>
+      </div>
+    </div>
+
+
+    <!-- Actions -->
+    <div class="flex gap-3 flex-shrink-0">
+      <button (click)="navigateToCart()"
+        class="flex items-center gap-2 bg-[#155fc2] hover:bg-[#114b9c] text-white rounded-full px-5 py-2 text-sm font-bold transition-all">
+        <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+      </button>
+
+      <button *ngIf="!isLoggedIn()" (click)="navigateToLogin()"
+        class="flex items-center bg-[#0d47a1] hover:bg-[#082e6b] text-white rounded-full px-6 py-2 text-sm font-bold transition-all">
+        Đăng nhập
+      </button>
+      <button *ngIf="isLoggedIn()" (click)="navigateToAccount()"
+        class="flex items-center gap-2 bg-[#0d47a1] hover:bg-[#082e6b] text-white rounded-full px-6 py-2 text-sm font-bold transition-all">
+        <i class="fa-solid fa-user"></i> Tài khoản
+      </button>
+    </div>
+  </div>
+</header>

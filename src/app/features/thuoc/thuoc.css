@@ -1,0 +1,5 @@
+
+
+.border-dashed { border-style: dashed !important; border-color: #dee2e6 !important; }
+.form-control, .form-select { border-color: #dee2e6; padding: 0.6rem 0.75rem; }
+.form-control:focus, .form-select:focus { border-color: #198754; box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25); }

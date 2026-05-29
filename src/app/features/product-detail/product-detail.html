@@ -1,0 +1,120 @@
+<div class="max-w-6xl mx-auto px-4 mt-6 mb-12">
+
+  @if (isLoading) {
+  <div class="text-center py-20"><div class="spinner-border text-blue-500 w-12 h-12 border-4 rounded-full"></div></div>
+  }
+
+  @if (!isLoading && thuoc) {
+
+  <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 mb-8">
+
+    <div class="flex items-center gap-2 text-sm text-gray-500 mb-8 pb-4 border-b border-gray-100">
+      <i class="fas fa-home"></i>
+      <a routerLink="/" class="hover:text-blue-600 no-underline text-gray-500 transition-colors">Trang chủ</a>
+      <span class="mx-1">/</span>
+      <a routerLink="/category" class="hover:text-blue-600 no-underline text-gray-500 transition-colors">Thực phẩm chức năng</a>
+      <span class="mx-1">/</span>
+      <span class="text-blue-700 font-bold truncate">{{ thuoc.tenThuoc }}</span>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-10">
+      <div class="w-full md:w-2/5 flex flex-col items-center">
+        <div class="w-full h-80 flex items-center justify-center relative mb-6">
+          <button class="absolute left-0 w-10 h-10 bg-white border rounded-full shadow hover:bg-gray-50 flex items-center justify-center transition-colors"><i class="fas fa-chevron-left text-gray-500"></i></button>
+          <img [src]="thuoc.hinhAnh" (error)="$event.target.src='https://via.placeholder.com/400x400?text=Thieu+Anh'" class="max-h-full object-contain p-4">
+          <button class="absolute right-0 w-10 h-10 bg-white border rounded-full shadow hover:bg-gray-50 flex items-center justify-center transition-colors"><i class="fas fa-chevron-right text-gray-500"></i></button>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-16 h-16 border-2 border-blue-500 rounded-lg p-1 cursor-pointer hover:shadow-md transition-shadow">
+            <img [src]="thuoc.hinhAnh" (error)="$event.target.src='https://via.placeholder.com/150'" class="w-full h-full object-contain">
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full md:w-3/5">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6 leading-tight">{{ thuoc.tenThuoc }}</h1>
+
+        <div class="grid grid-cols-12 gap-y-4 text-sm mb-6 border-b pb-6">
+          <div class="col-span-4 text-gray-500 font-medium">Công dụng</div>
+          <div class="col-span-8 text-gray-800 line-clamp-2">{{ thuoc.moTa }}</div>
+
+          <div class="col-span-4 text-gray-500 font-medium">Danh mục</div>
+          <div class="col-span-8 text-blue-600 font-medium cursor-pointer hover:underline">{{ getTenDanhMuc(thuoc.maDanhMuc) }}</div>
+
+          <div class="col-span-4 text-gray-500 font-medium">Dạng bào chế</div>
+          <div class="col-span-8 text-gray-800">Viên nang cứng</div>
+
+          <div class="col-span-4 text-gray-500 font-medium">Xuất xứ</div>
+          <div class="col-span-8 text-gray-800">Việt Nam</div>
+        </div>
+
+        <div class="mb-6">
+          <div class="flex items-baseline gap-2 mb-6">
+            <span class="text-blue-600 font-bold text-4xl">{{ thuoc.giaBan | number }} ₫</span>
+            <span class="text-gray-500 text-lg font-normal">/ Hộp</span>
+          </div>
+
+          <div class="flex items-center gap-6 mb-8">
+            <span class="text-sm font-medium text-gray-700">Chọn số lượng</span>
+            <div class="flex items-center border border-gray-300 rounded-full h-10 w-32 overflow-hidden">
+              <button (click)="giamSoLuong()" class="w-10 h-full bg-gray-50 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-600 transition-colors">-</button>
+              <input type="number" [(ngModel)]="soLuong" (input)="kiemTraSoLuongInput($event)" min="1" class="w-full h-full text-center border-x border-gray-300 outline-none text-sm font-bold text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+              <button (click)="tangSoLuong()" class="w-10 h-full bg-gray-50 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-600 transition-colors">+</button>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <button (click)="themVaoGioHang()" class="flex-1 bg-[#0084ff] hover:bg-blue-700 text-white font-bold py-3.5 rounded-full transition-all duration-300 text-sm shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+              Thêm vào giỏ hàng
+            </button>
+            <button (click)="muaNgay()" class="flex-1 bg-white border-2 border-[#0084ff] text-[#0084ff] hover:bg-blue-50 font-bold py-3.5 rounded-full transition-all duration-300 text-sm shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
+              Mua ngay
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-[#f8f9fa] rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 mb-8">
+    <h3 class="font-bold text-gray-900 mb-4">Thành phần</h3>
+    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-gray-700 font-bold w-2/3">Thông tin thành phần</th>
+            <th class="px-6 py-3 text-gray-700 font-bold w-1/3 text-right">Hàm lượng</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <tr>
+            <td class="px-6 py-4 text-gray-600">Thành phần hoạt tính</td>
+            <td class="px-6 py-4 text-gray-600 text-right font-medium">10mg</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="text-sm text-gray-700 space-y-4 leading-relaxed">
+      <p><strong>Công dụng</strong><br>Bổ sung các hoạt chất thiết yếu, tăng cường sức đề kháng.</p>
+      <p><strong>Cách dùng - Liều dùng</strong><br>Giảm nguy cơ mắc bệnh: 1 - 2 viên/lần x 2 lần/ngày.<br>Phục hồi sức khỏe: 2 - 3 viên/lần, ngày 2 - 3 lần.</p>
+      <p><strong>Lưu ý</strong><br>Sản phẩm này không phải là thuốc, không có tác dụng thay thế thuốc chữa bệnh.</p>
+      <p><strong>Bảo quản</strong><br>Nơi khô mát, tránh ánh nắng trực tiếp.</p>
+    </div>
+  </div>
+
+  <h2 class="text-xl font-bold text-gray-900 mb-4">Sản phẩm liên quan</h2>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    @for (item of [1, 2, 3, 4]; track item) {
+    <div class="bg-white rounded-xl p-4 flex flex-col items-center border border-gray-200 hover:border-blue-400 hover:shadow-lg transition-all duration-300 cursor-pointer">
+      <img [src]="thuoc.hinhAnh" (error)="$event.target.src='https://via.placeholder.com/150'" class="w-28 h-28 object-contain mb-3 bg-white p-2 rounded-lg mix-blend-multiply">
+      <h3 class="text-xs text-gray-800 font-bold text-center mb-1 line-clamp-2 h-8">{{ thuoc.tenThuoc }} (Hộp 5 vỉ x 10 viên)</h3>
+      <div class="text-center w-full mt-auto mb-4">
+        <span class="text-red-600 font-black text-sm">{{ thuoc.giaBan | number }}đ <span class="text-gray-500 font-normal">/ Hộp</span></span>
+      </div>
+      <button class="w-full bg-white border border-blue-500 text-blue-500 font-bold py-2 rounded-full text-xs hover:bg-blue-50 transition-colors shadow-sm">+ Chọn mua</button>
+    </div>
+    }
+  </div>
+  }
+</div>
